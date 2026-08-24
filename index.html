@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistem Keuangan</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --bg-color: #f8f9fc;
+            --primary-dark: #1e1e2d;
+            --expense-color: #ff4d4f;
+            --income-color: #52c41a;
+            --transfer-color: #1890ff;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #e9ecef; /* Background luar untuk desktop */
+            margin: 0;
+            padding: 0;
+            color: var(--primary-dark);
+        }
+
+        /* Mobile Wrapper */
+        .app-container {
+            max-width: 414px;
+            margin: 0 auto;
+            background-color: var(--bg-color);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-x: hidden;
+            padding-bottom: 80px; /* space for bottom nav */
+        }
+
+        /* Header / Greeting */
+        .header-section {
+            padding: 20px 20px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header-section h4 { font-weight: 700; margin-bottom: 2px; }
+        .header-section p { font-size: 13px; color: #6c757d; margin-bottom: 0; }
+        .bell-icon {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            border: 1px solid #e0e0e0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #6c757d;
+        }
+
+        /* Wallet Cards Horizontal Scroll */
+        .wallet-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 10px 20px;
+            gap: 15px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .wallet-scroll::-webkit-scrollbar { display: none; } /* Chrome */
+        
+        .wallet-card {
+            min-width: 140px;
+            border-radius: 20px;
+            padding: 15px;
+            background: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0;
+        }
+        .wallet-card.active { border: 2px solid var(--income-color); }
+        .wallet-icon {
+            width: 35px; height: 35px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 15px; font-size: 16px;
+        }
+        .bg-light-success { background: #e8f5e9; color: #2e7d32; }
+        .bg-light-primary { background: #e3f2fd; color: #1565c0; }
+        .bg-light-info { background: #f3e5f5; color: #7b1fa2; }
+        
+        .wallet-card h6 { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
+        .wallet-card h5 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
+        .progress-bar-custom { height: 4px; border-radius: 2px; width: 100%; background: #f0f0f0; }
+        .progress-bar-custom .fill { height: 100%; border-radius: 2px; }
+
+        /* Chart Section */
+        .chart-container { background: #fff; margin: 15px 20px; border-radius: 20px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        
+        /* Transaction List */
+        .trx-list { padding: 0 20px 20px; }
+        .trx-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 15px 0; border-bottom: 1px solid #f0f0f0;
+        }
+        .trx-item:last-child { border-bottom: none; }
+        .trx-icon {
+            width: 45px; height: 45px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 15px;
+        }
+        .trx-details { flex-grow: 1; }
+        .trx-details h6 { margin: 0; font-size: 14px; font-weight: 600; }
+        .trx-details p { margin: 0; font-size: 12px; color: #888; }
+        .trx-amount { text-align: right; }
+        .trx-amount h6 { margin: 0; font-size: 14px; font-weight: 700; }
+        .text-expense { color: var(--expense-color); }
+        .text-income { color: var(--income-color); }
+
+        /* Input Form (Transactions Tab) */
+        .trx-type-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .trx-type-btn {
+            flex: 1; padding: 10px; border-radius: 12px; text-align: center;
+            border: 1px solid #e0e0e0; background: #f8f9fc; font-weight: 600; font-size: 14px;
+            color: #6c757d; cursor: pointer; transition: 0.3s;
+        }
+        .trx-type-btn.active.expense { background: #fff1f0; border-color: #ffa39e; color: var(--expense-color); }
+        .trx-type-btn.active.income { background: #f6ffed; border-color: #b7eb8f; color: var(--income-color); }
+        .trx-type-btn.active.transfer { background: #e6f7ff; border-color: #91d5ff; color: var(--transfer-color); }
+        
+        .form-control, .form-select { border-radius: 12px; padding: 12px 15px; border: 1px solid #e0e0e0; font-size: 14px; box-shadow: none !important; }
+        .btn-submit { background: var(--expense-color); color: white; border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; border: none; }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 414px;
+            background: #fff; padding: 15px 20px;
+            display: flex; justify-content: space-between;
+            border-top: 1px solid #f0f0f0; border-radius: 30px 30px 0 0;
+            box-shadow: 0 -5px 20px rgba(0,0,0,0.03);
+            z-index: 1000;
+        }
+        .nav-item {
+            text-align: center; color: #a0a0a0; font-size: 12px; cursor: pointer; flex: 1;
+        }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
+        .nav-item.active { color: #0d6efd; font-weight: 600; }
+
+        /* Page Content Toggle */
+        .page-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .page-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- TAB: HOME -->
+    <div id="tab-home" class="page-content active">
+        <div class="header-section">
+            <div>
+                <h4 id="greeting-name">Hi, User 👋</h4>
+                <p id="school-name">Sistem Keuangan</p>
+            </div>
+            <div class="bell-icon"><i class="fa-regular fa-bell"></i></div>
+        </div>
+
+        <div class="d-flex justify-content-between px-3 mt-2">
+            <h6 class="fw-bold mb-0">My Wallets</h6>
+            <a href="#" class="text-decoration-none text-muted" style="font-size: 13px;" onclick="switchTab('wallets')">Lihat Semua ></a>
+        </div>
+        
+        <div class="wallet-scroll" id="home-wallets-container">
+            <!-- Wallets injected by JS -->
+            <div class="text-center w-100 text-muted"><div class="spinner-border spinner-border-sm"></div> Memuat...</div>
+        </div>
+
+        <div class="chart-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Overview 7 Hari Terakhir</h6>
+                <select class="form-select form-select-sm w-auto border-0 bg-light rounded-pill"><option>7 Hari</option></select>
+            </div>
+            <div style="position: relative; height: 180px; width: 100%;">
+				<canvas id="overviewChart"></canvas>
+			</div>
+        </div>
+
+        <div class="trx-list mt-2">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h6 class="fw-bold mb-0">Transaksi Terakhir</h6>
+                <a href="#" class="text-decoration-none text-muted" style="font-size: 13px;" onclick="switchTab('transactions')">Lihat Semua</a>
+            </div>
+            <div id="home-trx-container">
+                <!-- Transactions injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: WALLETS (Detail) -->
+    <div id="tab-wallets" class="page-content">
+        <div class="header-section">
+            <h3 class="fw-bold">Wallets</h3>
+        </div>
+        <p class="px-3 text-muted" style="font-size:14px; margin-top:-10px;">Kelola semua sumber keuanganmu</p>
+        
+        <div class="wallet-scroll" id="detail-wallets-container">
+             <!-- Wallets injected by JS -->
+        </div>
+
+        <div class="chart-container mt-3" style="border: 2px solid #e8f5e9; background: #fafdfa;">
+            <div class="d-flex align-items-center mb-3">
+                <div class="wallet-icon bg-light-success mb-0 me-3"><i class="fa-solid fa-wallet"></i></div>
+                <div><h6 class="fw-bold mb-0">Detail Wallet Utama</h6><small class="text-muted">Ringkasan hari ini</small></div>
+            </div>
+            <div class="row text-center mb-3">
+                <div class="col-4 border-end">
+                    <small class="text-muted d-block">Sisa Saldo</small>
+                    <strong class="text-success" id="det-sisa" style="font-size:14px;">Rp 0</strong>
+                </div>
+                <div class="col-4 border-end">
+                    <small class="text-muted d-block">Terpakai</small>
+                    <strong class="text-danger" style="font-size:14px;">Rp 0</strong>
+                </div>
+                <div class="col-4">
+                    <small class="text-muted d-block">Pemasukan</small>
+                    <strong class="text-success" style="font-size:14px;">Rp 0</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: TRANSACTIONS (Input Form) -->
+    <div id="tab-transactions" class="page-content">
+        <div class="header-section">
+            <h3 class="fw-bold">Transactions</h3>
+        </div>
+        <p class="px-3 text-muted" style="font-size:14px; margin-top:-10px;">Catat setiap pemasukan dan pengeluaran</p>
+
+        <div class="px-3">
+            <div class="trx-type-tabs">
+                <div class="trx-type-btn income" onclick="setTrxType('Income', this)"><i class="fa-solid fa-arrow-down me-1"></i> Income</div>
+                <div class="trx-type-btn active expense" onclick="setTrxType('Expense', this)"><i class="fa-solid fa-arrow-up me-1"></i> Expense</div>
+                <div class="trx-type-btn transfer" onclick="setTrxType('Transfer', this)"><i class="fa-solid fa-right-left me-1"></i> Transfer</div>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
+                <form id="formTransaction">
+                    <input type="hidden" id="inpType" value="Expense">
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Nominal</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0 border-radius-left">Rp</span>
+                            <input type="number" class="form-control border-start-0 ps-0" id="inpNominal" placeholder="0" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Kategori</label>
+                        <select class="form-select" id="inpCategory" required>
+                            <option value="Food & Drink">🍽️ Food & Drink</option>
+                            <option value="Shopping" selected>🛒 Shopping</option>
+                            <option value="Transportasi">⛽ Transportasi</option>
+                            <option value="Gaji/Income">💰 Gaji / Pemasukan</option>
+                            <option value="Transfer">🔄 Transfer</option>
+                            <option value="Lainnya">📦 Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Wallet Sumber/Tujuan</label>
+                        <select class="form-select" id="inpWallet" required>
+                            <option value="W1">Cash</option>
+                            <option value="W2">Debit</option>
+                            <option value="W3">Savings</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Tanggal</label>
+                        <input type="date" class="form-control" id="inpDate" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Keterangan (Opsional)</label>
+                        <input type="text" class="form-control" id="inpDesc" placeholder="Belanja keperluan...">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold" style="font-size: 13px;">Photo Nota (Opsional UI)</label>
+                        <div class="border border-dashed rounded-3 p-3 text-center text-primary" style="background: #f8f9fc; border-style: dashed !important; border-color: #cbd5e1 !important;">
+                            <i class="fa-solid fa-camera mb-2"></i><br>
+                            <span style="font-size: 12px;">Tambah Foto (Maks 2MB)</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="btnSubmitTrx">Simpan Transaksi</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB: SETTINGS -->
+    <div id="tab-setting" class="page-content">
+        <div class="header-section">
+            <h3 class="fw-bold">Settings</h3>
+        </div>
+        
+        <div class="px-3 pb-5">
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-center">
+                <div class="mb-3">
+                    <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" class="rounded-circle" width="70" alt="Avatar">
+                </div>
+                <h5 class="fw-bold mb-0">Pengaturan Aplikasi</h5>
+                <p class="text-muted" style="font-size: 13px;">Hubungkan ke Google Apps Script</p>
+            </div>
+
+            <form id="formSettings">
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">URL Google Apps Script</label>
+                    <input type="url" class="form-control" id="setAppUrl" placeholder="https://script.google.com/macros/s/.../exec" required>
+                    <small class="text-danger" style="font-size:11px;">*Wajib diisi agar aplikasi berfungsi</small>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nama Pengguna</label>
+                    <input type="text" class="form-control" id="setUserName" placeholder="Nama Anda" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Identitas Sekolah / Instansi</label>
+                    <input type="text" class="form-control" id="setSchoolName" placeholder="Contoh: SMA Negeri 1" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold">Simpan Pengaturan</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('home')" id="nav-home">
+            <i class="fa-solid fa-house"></i>Home
+        </div>
+        <div class="nav-item" onclick="switchTab('wallets')" id="nav-wallets">
+            <i class="fa-solid fa-wallet"></i>Wallets
+        </div>
+        <div class="nav-item" onclick="switchTab('transactions')" id="nav-transactions">
+            <i class="fa-solid fa-file-invoice-dollar"></i>Transactions
+        </div>
+        <div class="nav-item" onclick="switchTab('setting')" id="nav-setting">
+            <i class="fa-solid fa-gear"></i>Setting
+        </div>
+    </div>
+
+</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script>
+    // Utils & State
+    let APP_URL = localStorage.getItem('API_URL') || '';
+    let globalData = { wallets: [], transactions: [] };
+
+    // Format Rupiah
+    const formatRp = (angka) => {
+        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+    };
+    
+    // Set Date Today in Form
+    document.getElementById('inpDate').valueAsDate = new Date();
+
+    // Tab Navigation Switcher
+    function switchTab(tabId) {
+        document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById(`tab-${tabId}`).classList.add('active');
+        document.getElementById(`nav-${tabId}`).classList.add('active');
+
+        if(tabId === 'home' && APP_URL) loadData();
+    }
+
+    // Set Transaction Type UI
+    function setTrxType(type, element) {
+        document.querySelectorAll('.trx-type-btn').forEach(el => el.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('inpType').value = type;
+        
+        let btn = document.getElementById('btnSubmitTrx');
+        if(type === 'Expense') { btn.style.backgroundColor = 'var(--expense-color)'; }
+        else if(type === 'Income') { btn.style.backgroundColor = 'var(--income-color)'; }
+        else { btn.style.backgroundColor = 'var(--transfer-color)'; }
+    }
+
+    // Save Settings
+    document.getElementById('formSettings').addEventListener('submit', function(e) {
+        e.preventDefault();
+        APP_URL = document.getElementById('setAppUrl').value;
+        localStorage.setItem('API_URL', APP_URL);
+        localStorage.setItem('USER_NAME', document.getElementById('setUserName').value);
+        localStorage.setItem('SCHOOL_NAME', document.getElementById('setSchoolName').value);
+        
+        applySettings();
+        Swal.fire('Tersimpan!', 'Pengaturan berhasil disimpan', 'success');
+        
+        if(APP_URL) loadData();
+    });
+
+    function applySettings() {
+        document.getElementById('setAppUrl').value = APP_URL;
+        document.getElementById('setUserName').value = localStorage.getItem('USER_NAME') || 'Alex';
+        document.getElementById('setSchoolName').value = localStorage.getItem('SCHOOL_NAME') || 'Kelola keuanganmu';
+        
+        document.getElementById('greeting-name').innerText = `Hi, ${localStorage.getItem('USER_NAME') || 'Alex'} 👋`;
+        document.getElementById('school-name').innerText = localStorage.getItem('SCHOOL_NAME') || 'Kelola keuanganmu';
+    }
+
+    // Load Data from GAS
+    async function loadData() {
+        if(!APP_URL) {
+            Swal.fire('Perhatian', 'Silakan masukkan URL Google Apps Script di tab Setting terlebih dahulu.', 'warning');
+            switchTab('setting');
+            return;
+        }
+
+        try {
+            const response = await fetch(APP_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getData' })
+            });
+            const res = await response.json();
+            
+            if(res.status === 'success') {
+                globalData = res.data;
+                renderWallets(globalData.wallets);
+                renderTransactions(globalData.transactions);
+                renderChart(globalData.transactions);
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire('Error', 'Gagal mengambil data dari server', 'error');
+        }
+    }
+
+    // Render Wallets (Home & Wallets Tab)
+    function renderWallets(wallets) {
+        let html = '';
+        let totalAll = wallets.reduce((sum, w) => sum + parseFloat(w.balance), 0);
+        
+        let walletOptions = '';
+
+        wallets.forEach(w => {
+            let percentage = totalAll > 0 ? Math.round((w.balance / totalAll) * 100) : 0;
+            let iconClass = w.name.toLowerCase() === 'cash' ? 'fa-wallet bg-light-success' : 
+                            (w.name.toLowerCase() === 'debit' ? 'fa-credit-card bg-light-primary' : 'fa-piggy-bank bg-light-info');
+            let colorHex = w.color === 'success' ? '#52c41a' : (w.color === 'primary' ? '#1890ff' : '#7b1fa2');
+
+            html += `
+            <div class="wallet-card">
+                <div class="wallet-icon ${iconClass}"><i class="fa-solid"></i></div>
+                <h6 style="color: ${colorHex}">${w.name}</h6>
+                <h5>${formatRp(w.balance)}</h5>
+                <p style="font-size:11px; margin-bottom:5px; color:#888;">${percentage}% dari total</p>
+                <div class="progress-bar-custom">
+                    <div class="fill" style="width: ${percentage}%; background-color: ${colorHex};"></div>
+                </div>
+            </div>`;
+            
+            walletOptions += `<option value="${w.id}">${w.name} (${formatRp(w.balance)})</option>`;
+        });
+
+        document.getElementById('home-wallets-container').innerHTML = html;
+        document.getElementById('detail-wallets-container').innerHTML = html;
+        document.getElementById('inpWallet').innerHTML = walletOptions;
+
+        // Update detail mockup
+        if(wallets.length > 0) document.getElementById('det-sisa').innerText = formatRp(wallets[0].balance);
+    }
+
+    // Render Transactions (Home Tab)
+    function renderTransactions(trxList) {
+        let html = '';
+        trxList.slice(0,5).forEach(t => {
+            let isExpense = t.type === 'Expense';
+            let icon = 'fa-receipt text-secondary bg-light';
+            if(t.category.includes('Food')) icon = 'fa-utensils text-warning bg-warning bg-opacity-10';
+            else if(t.category.includes('Shopping')) icon = 'fa-cart-shopping text-danger bg-danger bg-opacity-10';
+            else if(t.category.includes('Gaji') || t.type === 'Income') icon = 'fa-arrow-down text-success bg-success bg-opacity-10';
+            else if(t.category.includes('Transport')) icon = 'fa-gas-pump text-primary bg-primary bg-opacity-10';
+            else if(t.type === 'Transfer') icon = 'fa-right-left text-info bg-info bg-opacity-10';
+
+            // Format date string to dd MMM yyyy
+            let d = new Date(t.date);
+            let dateStr = `${d.getDate()} ${d.toLocaleString('id-ID', {month:'short'})} ${d.getFullYear()}`;
+
+            html += `
+            <div class="trx-item">
+                <div class="trx-icon ${icon.split(' ').slice(1).join(' ')}"><i class="fa-solid ${icon.split(' ')[0]}"></i></div>
+                <div class="trx-details">
+                    <h6>${t.desc || t.category}</h6>
+                    <p>${t.category} • ${dateStr}</p>
+                </div>
+                <div class="trx-amount">
+                    <h6 class="${isExpense ? 'text-expense' : 'text-income'}">${isExpense ? '-' : '+'} ${formatRp(t.nominal)}</h6>
+                </div>
+            </div>`;
+        });
+        
+        if(trxList.length === 0) html = '<p class="text-center text-muted">Belum ada transaksi.</p>';
+        document.getElementById('home-trx-container').innerHTML = html;
+    }
+
+    // Handle Submit Transaction
+    document.getElementById('formTransaction').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        if(!APP_URL) return Swal.fire('Error', 'Setup URL API di tab setting dulu!', 'error');
+
+        const btn = document.getElementById('btnSubmitTrx');
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
+        btn.disabled = true;
+
+        const payload = {
+            action: 'addTransaction',
+            type: document.getElementById('inpType').value,
+            nominal: document.getElementById('inpNominal').value,
+            category: document.getElementById('inpCategory').value,
+            wallet: document.getElementById('inpWallet').value,
+            date: document.getElementById('inpDate').value,
+            desc: document.getElementById('inpDesc').value
+        };
+
+        try {
+            const response = await fetch(APP_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            });
+            const res = await response.json();
+            
+            if(res.status === 'success') {
+                Swal.fire('Berhasil!', 'Transaksi berhasil dicatat', 'success');
+                document.getElementById('formTransaction').reset();
+                document.getElementById('inpDate').valueAsDate = new Date();
+                loadData(); // Refresh Data
+                switchTab('home'); // Kembali ke home
+            }
+        } catch (error) {
+            Swal.fire('Gagal', 'Terjadi kesalahan jaringan', 'error');
+        } finally {
+            btn.innerHTML = 'Simpan Transaksi';
+            btn.disabled = false;
+        }
+    });
+
+    // Render Chart.js
+    let myChart = null;
+    function renderChart(trxList) {
+        const ctx = document.getElementById('overviewChart').getContext('2d');
+        if(myChart) myChart.destroy();
+
+        // Data dummy untuk visualisasi meniru gambar (Kenyataannya harus di-grouping per tanggal dari trxList)
+        const labels = ['7 Mei', '8 Mei', '9 Mei', '10 Mei', '11 Mei', '12 Mei', '13 Mei'];
+        const dataIncome = [1000000, 950000, 1400000, 1100000, 900000, 1150000, 1250000];
+        const dataExpense = [500000, 650000, 900000, 600000, 500000, 700000, 800000];
+
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'Pemasukan', data: dataIncome, backgroundColor: '#52c41a', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.4 },
+                    { label: 'Pengeluaran', data: dataExpense, backgroundColor: '#ff4d4f', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.4 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [5, 5] }, ticks: { callback: function(val) { return val/1000 + 'K'; } } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // Init Apps
+    applySettings();
+    if(APP_URL) loadData();
+
+</script>
+</body>
+</html>
