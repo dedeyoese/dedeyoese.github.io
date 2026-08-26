@@ -1,0 +1,64 @@
+<div id="view-setting" class="page-view">
+  
+  <!-- Header -->
+  <div class="mb-4 mt-2">
+    <h3 class="fw-bold mb-0">Settings</h3>
+    <small class="text-muted">Pengaturan profil dan database aplikasi</small>
+  </div>
+
+  <!-- 1. Profil Pengguna -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4 p-3">
+    <h6 class="fw-bold mb-3"><i class="bi bi-person me-2 text-primary"></i>Profil Pengguna</h6>
+    <div class="mb-3">
+      <label class="form-label fs-8 text-muted">Nama Pemilik</label>
+      <input type="text" id="input-nama" class="form-control bg-light" placeholder="Masukkan nama Anda (Misal: Alex)">
+    </div>
+    <button class="btn btn-primary w-100 fw-bold rounded-3 py-2 fs-7" onclick="simpanProfil()">Simpan Profil</button>
+  </div>
+
+  <!-- 2. Koneksi Database -->
+  <div class="card border-0 shadow-sm rounded-4 mb-4 p-3">
+    <h6 class="fw-bold mb-3"><i class="bi bi-database me-2 text-dark"></i>Koneksi Spreadsheet</h6>
+    <div class="mb-3">
+      <label class="form-label fs-8 text-muted">Link URL / ID Spreadsheet</label>
+      <input type="url" id="input-spreadsheet" class="form-control bg-light" placeholder="https://docs.google.com/spreadsheets/d/...">
+      <small class="text-danger mt-1 d-block" style="font-size: 0.65rem;">*Pastikan URL benar dan memiliki akses edit</small>
+    </div>
+    <button class="btn btn-dark w-100 fw-bold rounded-3 py-2 fs-7" onclick="simpanDatabase()">Simpan Koneksi</button>
+  </div>
+
+  <!-- 3. Set Nominal Awal -->
+  <div class="card border-0 shadow-sm rounded-4 mb-5 p-3">
+    <h6 class="fw-bold mb-3"><i class="bi bi-wallet2 me-2 text-success"></i>Saldo Awal Kategori</h6>
+    
+    <div class="mb-3">
+      <label class="form-label fs-8 fw-bold text-success">Cash</label>
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 fs-7">Rp</span>
+        <input type="number" id="input-saldo-cash" class="form-control border-start-0 ps-0 fw-bold" placeholder="0">
+      </div>
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label fs-8 fw-bold text-primary">Debit</label>
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 fs-7">Rp</span>
+        <input type="number" id="input-saldo-debit" class="form-control border-start-0 ps-0 fw-bold" placeholder="0">
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <label class="form-label fs-8 fw-bold" style="color: #8b5cf6;">Savings</label>
+      <div class="input-group">
+        <span class="input-group-text bg-white border-end-0 fs-7">Rp</span>
+        <input type="number" id="input-saldo-savings" class="form-control border-start-0 ps-0 fw-bold" placeholder="0">
+      </div>
+    </div>
+    
+    <button class="btn btn-success w-100 fw-bold rounded-3 py-2 fs-7" onclick="simpanSaldoAwal()">Simpan Saldo Awal</button>
+  </div>
+  
+  <!-- Jarak ekstra agar tidak tertutup menu bawah -->
+  <div style="height: 20px;"></div>
+
+</div>
