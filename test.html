@@ -1,0 +1,46 @@
+// Ganti dengan URL Web App yang baru saja Anda salin
+const API_URL = "URL_WEB_APP_ANDA_DISINI"; 
+
+// Ganti dengan ID Spreadsheet Master Anda (ambil dari URL Spreadsheet: https://docs.google.com/spreadsheets/d/ID_INI/edit)
+const SPREADSHEET_ID = "ID_SPREADSHEET_ANDA_DISINI"; 
+
+async function testAddTransaction() {
+  const payloadData = {
+    action: "ADD_TRANSACTION",
+    sheetId: SPREADSHEET_ID,
+    payload: {
+      tanggal: new Date().toISOString().split('T')[0],
+      jenis: "Transfer", 
+      nominal: 150000,
+      walletAsal: "Cash",
+      walletTujuan: "Debit",
+      kategori: "Mutasi",
+      catatan: "Uji coba transfer antar dompet via API",
+      strukBase64: "" // Dikosongkan untuk tes awal
+    }
+  };
+
+  try {
+    console.log("Mengirim request ke Backend...");
+    
+    // Konfigurasi Fetch standar untuk GAS
+    const response = await fetch(API_URL, {
+      method: "POST",
+      body: JSON.stringify(payloadData),
+      // Headers tidak ditambahkan secara eksplisit karena GAS kadang menolak preflight CORS jika ada header kustom
+    });
+
+    const result = await response.json();
+    console.log("Respons dari Server:", result);
+    
+    if(result.status === "success") {
+       alert("Sukses! Silakan cek Spreadsheet Anda.");
+    }
+    
+  } catch (error) {
+    console.error("Gagal menghubungi API:", error);
+  }
+}
+
+// Jalankan fungsi
+testAddTransaction();
