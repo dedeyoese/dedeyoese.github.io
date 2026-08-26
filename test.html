@@ -1,55 +1,74 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test API Backend Keuangan</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .status { padding: 10px; margin-top: 20px; border-radius: 5px; }
+        .info { background-color: #e7f3fe; border-left: 6px solid #2196F3; }
+    </style>
 </head>
 <body>
-<scipt>
-// Ganti dengan URL Web App yang baru saja Anda salin
-const API_URL = "https://script.google.com/macros/s/AKfycbw3ZQklgfJ4C0IDofDUdwTp_gxYOBSXQlreAzfCHpwLLHbyE3nFdT1I5aMs8fyqFj24jA/exec"; 
 
-// Ganti dengan ID Spreadsheet Master Anda (ambil dari URL Spreadsheet: https://docs.google.com/spreadsheets/d/ID_INI/edit)
-const SPREADSHEET_ID = "1ik6vw4Mjequ8FnLJhjscjneL3LJYL3XP7co2sChKHco"; 
-
-async function testAddTransaction() {
-  const payloadData = {
-    action: "ADD_TRANSACTION",
-    sheetId: SPREADSHEET_ID,
-    payload: {
-      tanggal: new Date().toISOString().split('T')[0],
-      jenis: "Transfer", 
-      nominal: 150000,
-      walletAsal: "Cash",
-      walletTujuan: "Debit",
-      kategori: "Mutasi",
-      catatan: "Uji coba transfer antar dompet via API",
-      strukBase64: "" // Dikosongkan untuk tes awal
-    }
-  };
-
-  try {
-    console.log("Mengirim request ke Backend...");
+    <h2>Uji Coba Koneksi Backend GAS</h2>
+    <p>Script sedang berjalan di latar belakang. Silakan buka <strong>Developer Tools</strong> untuk melihat detail log.</p>
     
-    // Konfigurasi Fetch standar untuk GAS
-    const response = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(payloadData),
-      // Headers tidak ditambahkan secara eksplisit karena GAS kadang menolak preflight CORS jika ada header kustom
-    });
+    <div class="status info">
+        <strong>Cara melihat log:</strong><br>
+        1. Klik kanan pada halaman web ini.<br>
+        2. Pilih <strong>Inspect</strong> (atau tekan <strong>F12</strong> di keyboard).<br>
+        3. Klik tab <strong>Console</strong>.
+    </div>
 
-    const result = await response.json();
-    console.log("Respons dari Server:", result);
-    
-    if(result.status === "success") {
-       alert("Sukses! Silakan cek Spreadsheet Anda.");
-    }
-    
-  } catch (error) {
-    console.error("Gagal menghubungi API:", error);
-  }
-}
+    <!-- Di sinilah JavaScript dieksekusi -->
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbw3ZQkIgfj4COIDofDUdwTp_gxYOBSXQlreAzfCHpwLLHbyE3nFdT1I5aMs8fyqFj24jA/exec";
+        const SPREADSHEET_ID = "1ik6vw4Mjequ8FnLjhjscjneL3LJYL3XP7co2sChKHco"; 
 
-// Jalankan fungsi
-testAddTransaction();
-</scipt>
+        async function testAddTransaction() {
+            const payloadData = {
+                action: "ADD_TRANSACTION",
+                sheetId: SPREADSHEET_ID,
+                payload: {
+                    tanggal: new Date().toISOString().split('T')[0],
+                    jenis: "Transfer", 
+                    nominal: 150000,
+                    walletAsal: "Cash",
+                    walletTujuan: "Debit",
+                    kategori: "Mutasi",
+                    catatan: "Uji coba transfer antar dompet via API",
+                    strukBase64: "" 
+                }
+            };
+
+            try {
+                console.log("Memulai proses... Mengirim request ke Backend GAS...");
+                
+                const response = await fetch(API_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payloadData),
+                });
+
+                const result = await response.json();
+                console.log("Respons dari Server:", result);
+                
+                if(result.status === "success") {
+                    alert("Sukses! Data berhasil dikirim. Silakan cek Spreadsheet Anda.");
+                } else {
+                    alert("Terjadi kesalahan di Backend: " + result.message);
+                }
+                
+            } catch (error) {
+                console.error("Gagal menghubungi API:", error);
+                alert("Gagal menghubungi API. Cek console log (F12) untuk detailnya.");
+            }
+        }
+
+        // Menjalankan fungsi secara otomatis saat halaman dibuka
+        testAddTransaction();
+    </script>
+
 </body>
 </html>
