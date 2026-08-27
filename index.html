@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aplikasi Keuangan Web-Based</title>
+    <title>Cateet</title>
     
     <!-- Pustaka Eksternal -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -151,14 +151,63 @@
 
         <!-- ================= VIEW: WALLETS ================= -->
         <section id="view-wallets" class="view-section">
-            <header class="header-top">
+            <header class="header-top" style="margin-bottom: 20px;">
                 <div>
                     <h2>Wallets</h2>
                     <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Kelola semua sumber keuanganmu</p>
                 </div>
-                <div class="icon-btn"><i class="fa-solid fa-plus"></i></div>
+                <!-- Tombol + untuk tambah Wallet -->
+                <div class="icon-btn" onclick="addNewWallet()" style="color: var(--primary); border-color: var(--primary-light);">
+                    <i class="fa-solid fa-plus"></i>
+                </div>
             </header>
-            <p style="text-align:center; color:var(--text-muted); margin-top: 50px;">Halaman Detail Wallets (Tahap 2)</p>
+
+            <!-- 1. Navigasi Kartu Wallet -->
+            <div class="horizontal-scroll" id="wallets-page-list" style="margin-bottom: 20px;">
+                <!-- Di-render oleh JavaScript -->
+            </div>
+
+            <!-- 2. Kontainer Detail Wallet (Awalnya tersembunyi) -->
+            <div id="wallet-detail-container" style="display:none; background: var(--white); border-radius: 16px; padding: 16px; border: 1.5px solid var(--border); box-shadow: var(--shadow); transition: 0.3s;">
+                <!-- Header Detail -->
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px dashed var(--border); padding-bottom: 15px; margin-bottom: 15px;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div id="detail-w-icon" style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:16px;"></div>
+                        <div>
+                            <h3 id="detail-w-name" style="font-size:16px;">Nama Wallet</h3>
+                            <p style="font-size:11px; color:var(--text-muted); margin-top:4px;">Uang tunai / saldo yang kamu miliki</p>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-up" style="color:var(--text-muted); cursor:pointer;" onclick="document.getElementById('wallet-detail-container').style.display='none'"></i>
+                </div>
+
+                <!-- Summary Boxes -->
+                <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                    <div class="summary-box" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:#F8FAFC;">
+                        <span style="font-size:10px; font-weight:600; color:var(--text-muted);">Sisa Saldo <i class="fa-solid fa-circle-info"></i></span>
+                        <strong id="detail-w-saldo" style="display:block; margin:6px 0; font-size:14px; color:var(--success);">Rp 0</strong>
+                    </div>
+                    <div class="summary-box" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:#F8FAFC;">
+                        <span style="font-size:10px; font-weight:600; color:var(--text-muted);">Terpakai Hari Ini <i class="fa-solid fa-circle-info"></i></span>
+                        <strong id="detail-w-expense" style="display:block; margin:6px 0; font-size:14px; color:var(--text-dark);">Rp 0</strong>
+                        <small id="detail-w-expense-count" style="font-size:10px; color:var(--text-muted);">0 transaksi</small>
+                    </div>
+                    <div class="summary-box" style="flex:1; padding:12px; border-radius:12px; border:1px solid var(--border); background:#F8FAFC;">
+                        <span style="font-size:10px; font-weight:600; color:var(--text-muted);">Pemasukan Hari Ini <i class="fa-solid fa-circle-info"></i></span>
+                        <strong id="detail-w-income" style="display:block; margin:6px 0; font-size:14px; color:var(--success);">Rp 0</strong>
+                        <small id="detail-w-income-count" style="font-size:10px; color:var(--text-muted);">0 transaksi</small>
+                    </div>
+                </div>
+
+                <!-- Riwayat Transaksi Wallet Spesifik -->
+                <div class="title-sm" style="margin-bottom: 15px;">
+                    <span style="font-size:13px;">Transaksi Terpakai Hari Ini</span>
+                    <a href="#" class="text-link" style="color:var(--success); font-weight:600;">Lihat Semua</a>
+                </div>
+                <div id="detail-w-history">
+                    <p style="text-align:center; font-size:12px; color:var(--text-muted);">Memuat riwayat...</p>
+                </div>
+            </div>
         </section>
 
         <!-- ================= VIEW: TRANSACTIONS ================= -->
@@ -198,11 +247,13 @@
                 <div class="form-group">
                     <label>Kategori</label>
                     <select id="txKategori">
-                        <option value="Food & Drink">🍔 Food & Drink</option>
-                        <option value="Shopping" selected>🛒 Shopping</option>
-                        <option value="Transportasi">🚗 Transportasi</option>
-                        <option value="Gaji Bulanan">💰 Gaji Bulanan</option>
-                        <option value="Lainnya">📦 Lainnya</option>
+                        <option value="Makanan & Minuman">Makanan & Minuman</option>
+                        <option value="Belanja" selected>Belanja</option>
+                        <option value="Transportasi">Transportasi</option>
+                        <option value="Gaji Bulanan">Gaji Bulanan</option>
+                        <option value="Internet">Internet</option>
+                        <option value="Rumah">Rumah</option>
+                        <option value="Lainnya">Lainnya</option>
                     </select>
                 </div>
 
@@ -480,6 +531,14 @@
             elWalletTujuan.innerHTML = optionsHTML;
         }
 
+        // --- HELPER FORMAT TANGGAL UI ---
+        const formatTgl = (tgl) => {
+            const d = new Date(tgl);
+            if (isNaN(d)) return tgl;
+            const bulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            return `${d.getDate()} ${bulan[d.getMonth()]} ${d.getFullYear()}`;
+        };
+
         // C. Render Transaksi Terakhir (Home)
         const rContainer = document.getElementById("home-recent-tx");
         rContainer.innerHTML = "";
@@ -490,19 +549,20 @@
                 let isIncome = tx.jenis === "Income";
                 let isTransfer = tx.jenis === "Transfer";
                 let color = isIncome ? 'var(--success)' : (isTransfer ? 'var(--primary)' : 'var(--danger)');
-                let sign = isIncome ? '+' : (isTransfer ? '🔄' : '-');
+                let sign = isIncome ? '+' : (isTransfer ? '' : '-');
                 let icon = isIncome ? 'fa-arrow-down' : (isTransfer ? 'fa-money-bill-transfer' : 'fa-arrow-up');
                 
+                // Menerapkan flexbox constraints untuk mencegah tumpang tindih UI
                 rContainer.innerHTML += `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="width:35px; height:35px; border-radius:50%; background:#F3F4F6; display:flex; align-items:center; justify-content:center; color:${color};"><i class="fa-solid ${icon}"></i></div>
-                            <div>
-                                <div style="font-size:14px; font-weight:600;">${tx.kategori}</div>
-                                <div style="font-size:11px; color:var(--text-muted);">${tx.walletAsal || tx.walletTujuan} • ${tx.tanggal}</div>
+                        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                            <div style="min-width:35px; height:35px; border-radius:50%; background:#F3F4F6; display:flex; align-items:center; justify-content:center; color:${color}; flex-shrink:0;"><i class="fa-solid ${icon}"></i></div>
+                            <div style="overflow:hidden;">
+                                <div style="font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tx.kategori}</div>
+                                <div style="font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tx.walletAsal || tx.walletTujuan} • ${formatTgl(tx.tanggal)}</div>
                             </div>
                         </div>
-                        <div style="color:${color}; font-weight:600; font-size:14px;">${sign} Rp ${tx.nominal.toLocaleString('id-ID')}</div>
+                        <div style="color:${color}; font-weight:600; font-size:14px; white-space:nowrap; padding-left:10px; flex-shrink:0;">${sign} Rp ${tx.nominal.toLocaleString('id-ID')}</div>
                     </div>`;
             });
         }
@@ -518,29 +578,33 @@
                     let isIncome = tx.jenis === "Income";
                     let isTransfer = tx.jenis === "Transfer";
                     let color = isIncome ? 'var(--success)' : (isTransfer ? 'var(--primary)' : 'var(--danger)');
-                    let sign = isIncome ? '+' : (isTransfer ? '🔄' : '-');
+                    let sign = isIncome ? '+' : (isTransfer ? '' : '-');
                     let icon = isIncome ? 'fa-arrow-down' : (isTransfer ? 'fa-money-bill-transfer' : 'fa-arrow-up');
                     let bgIcon = isIncome ? '#E8F5E9' : (isTransfer ? '#E0E7FF' : '#FEE2E2');
                     let walletKeterangan = isTransfer ? `${tx.walletAsal} ➔ ${tx.walletTujuan}` : (isIncome ? tx.walletTujuan : tx.walletAsal);
 
                     historyContainer.innerHTML += `
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:var(--white); padding:12px; border-radius:12px; border:1px solid var(--border);">
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="width:40px; height:40px; border-radius:50%; background:${bgIcon}; display:flex; align-items:center; justify-content:center; color:${color}; font-size:14px;">
+                            <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                                <div style="min-width:40px; height:40px; border-radius:50%; background:${bgIcon}; display:flex; align-items:center; justify-content:center; color:${color}; font-size:14px; flex-shrink:0;">
                                     <i class="fa-solid ${icon}"></i>
                                 </div>
-                                <div>
-                                    <div style="font-size:14px; font-weight:600; color:var(--text-dark);">${tx.kategori}</div>
-                                    <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${walletKeterangan} • ${tx.tanggal}</div>
+                                <div style="overflow:hidden;">
+                                    <div style="font-size:14px; font-weight:600; color:var(--text-dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tx.kategori}</div>
+                                    <div style="font-size:11px; color:var(--text-muted); margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${walletKeterangan} • ${formatTgl(tx.tanggal)}</div>
                                 </div>
                             </div>
-                            <div style="text-align:right;">
+                            <div style="text-align:right; white-space:nowrap; padding-left:10px; flex-shrink:0;">
                                 <div style="color:${color}; font-weight:600; font-size:14px;">${sign} Rp ${tx.nominal.toLocaleString('id-ID')}</div>
                                 <div style="background:#F3F4F6; display:inline-block; padding:4px 8px; border-radius:6px; margin-top:5px; cursor:pointer;"><i class="fa-solid fa-ellipsis" style="color:var(--text-muted); font-size:12px;"></i></div>
                             </div>
                         </div>`;
                 });
             }
+        }
+        
+        if (typeof renderWalletsPage === "function") {
+            renderWalletsPage(data);
         }
 
         // E. Render Chart.js
@@ -671,6 +735,148 @@
         btnSubmit.disabled = false;
         btnSubmit.style.opacity = "1";
     }
+	
+	// ==========================================
+	// LOGIKA MENU WALLETS
+	// ==========================================
+	let globalWalletData = []; // Menyimpan data sementara untuk fungsi klik
+	let globalRecentTx = [];
+
+	// Fungsi ini harus dipanggil di dalam fungsi renderDashboard(data) yang sudah ada, 
+	// tepat di baris paling bawah sebelum renderChart(data.statistik);
+	function renderWalletsPage(data) {
+		globalWalletData = data.wallets;
+		globalRecentTx = data.recent;
+		
+		const container = document.getElementById("wallets-page-list");
+		container.innerHTML = "";
+		
+		// Hitung total saldo semua dompet untuk progress bar
+		let totalSemuaSaldo = data.wallets.reduce((sum, w) => sum + w.saldoAkhir, 0);
+
+		const colors = [{bg: '#E8F5E9', text: '#2ECC71', icon: 'fa-money-bill'}, {bg: '#E3F2FD', text: '#4A6EE0', icon: 'fa-credit-card'}, {bg: '#F3E5F5', text: '#9B59B6', icon: 'fa-piggy-bank'}];
+		
+		data.wallets.forEach((w, index) => {
+			let style = colors[index % colors.length];
+			// Hitung persentase
+			let persentase = totalSemuaSaldo > 0 ? Math.round((w.saldoAkhir / totalSemuaSaldo) * 100) : 0;
+			
+			container.innerHTML += `
+				<div class="wallet-card wallet-card-clickable" id="card-w-${index}" onclick="selectWallet(${index}, '${style.text}', '${style.bg}', '${style.icon}')" style="min-width: 150px;">
+					<div class="wallet-icon" style="background:${style.bg}; color:${style.text};"><i class="fa-solid ${style.icon}"></i></div>
+					<span style="font-size: 13px; font-weight: 600; color:${style.text};">${w.nama}</span>
+					<strong style="font-size: 16px; margin-top: 5px; display:block;">Rp ${w.saldoAkhir.toLocaleString('id-ID')}</strong>
+					<div style="font-size:10px; color:var(--text-muted); margin-top:10px;">${persentase}% dari total</div>
+					<div class="progress-bar-bg">
+						<div class="progress-bar-fill" style="width: ${persentase}%; background: ${style.text};"></div>
+					</div>
+				</div>`;
+		});
+	}
+
+	function selectWallet(index, textColor, bgColor, iconClass) {
+        const w = globalWalletData[index];
+        
+        document.querySelectorAll('.wallet-card-clickable').forEach(el => {
+            el.classList.remove('selected');
+            el.style.borderColor = 'transparent';
+        });
+        const selectedCard = document.getElementById(`card-w-${index}`);
+        selectedCard.classList.add('selected');
+        selectedCard.style.borderColor = textColor;
+
+        const detailContainer = document.getElementById("wallet-detail-container");
+        detailContainer.style.display = "block";
+        detailContainer.style.borderColor = bgColor; 
+
+        document.getElementById("detail-w-name").innerText = w.nama;
+        document.getElementById("detail-w-saldo").innerText = `Rp ${w.saldoAkhir.toLocaleString('id-ID')}`;
+        document.getElementById("detail-w-saldo").style.color = textColor;
+        
+        const iconEl = document.getElementById("detail-w-icon");
+        iconEl.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+        iconEl.style.background = bgColor;
+        iconEl.style.color = textColor;
+
+        // Penyesuaian pengecekan "Hari Ini" dengan format API baru
+        const d = new Date();
+        const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        
+        let expenseHariIni = 0; let incomeHariIni = 0;
+        let countExpense = 0; let countIncome = 0;
+        let historyHTML = "";
+
+        globalRecentTx.forEach(tx => {
+            if (tx.tanggal === todayStr && (tx.walletAsal === w.nama || tx.walletTujuan === w.nama)) {
+                let isIncome = (tx.jenis === "Income" && tx.walletTujuan === w.nama) || (tx.jenis === "Transfer" && tx.walletTujuan === w.nama);
+                let isExpense = (tx.jenis === "Expense" && tx.walletAsal === w.nama) || (tx.jenis === "Transfer" && tx.walletAsal === w.nama);
+
+                if (isIncome) { incomeHariIni += tx.nominal; countIncome++; }
+                if (isExpense) { expenseHariIni += tx.nominal; countExpense++; }
+
+                let color = isIncome ? 'var(--success)' : 'var(--danger)';
+                let sign = isIncome ? '+' : '-';
+                
+                historyHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">
+                            <div style="min-width:35px; height:35px; border-radius:50%; background:#F8FAFC; display:flex; align-items:center; justify-content:center; color:${color}; flex-shrink:0;">
+                                <i class="fa-solid ${isIncome ? 'fa-arrow-down' : 'fa-arrow-up'}"></i>
+                            </div>
+                            <div style="overflow:hidden;">
+                                <div style="font-size:14px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tx.kategori}</div>
+                                <div style="font-size:11px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${tx.catatan || tx.jenis}</div>
+                            </div>
+                        </div>
+                        <div style="text-align:right; white-space:nowrap; padding-left:10px; flex-shrink:0;">
+                            <div style="color:${color}; font-weight:600; font-size:14px;">${sign} Rp ${tx.nominal.toLocaleString('id-ID')}</div>
+                            <div style="font-size:10px; color:var(--text-muted);">Hari ini</div>
+                        </div>
+                    </div>`;
+            }
+        });
+
+        document.getElementById("detail-w-expense").innerText = `Rp ${expenseHariIni.toLocaleString('id-ID')}`;
+        document.getElementById("detail-w-expense-count").innerText = `${countExpense} transaksi`;
+        document.getElementById("detail-w-income").innerText = `Rp ${incomeHariIni.toLocaleString('id-ID')}`;
+        document.getElementById("detail-w-income-count").innerText = `${countIncome} transaksi`;
+
+        const historyEl = document.getElementById("detail-w-history");
+        historyEl.innerHTML = historyHTML || "<p style='text-align:center; font-size:12px; color:var(--text-muted);'>Tidak ada transaksi hari ini.</p>";
+    }
+
+	// 4. Fungsi Menambah Wallet Baru via API
+	async function addNewWallet() {
+		const namaWallet = prompt("Masukkan nama sumber dana baru (Contoh: E-Wallet, Tabungan Haji):");
+		if (!namaWallet) return;
+
+		const saldoAwalStr = prompt("Masukkan saldo awal (Contoh: 500000). Kosongkan jika 0:");
+		const saldoAwal = Number(saldoAwalStr) || 0;
+
+		const payloadData = {
+			action: "ADD_WALLET",
+			sheetId: localStorage.getItem("mySheetId"),
+			payload: { namaWallet: namaWallet, saldoAwal: saldoAwal }
+		};
+
+		try {
+			const response = await fetch(API_URL, {
+				method: "POST",
+				headers: { "Content-Type": "text/plain;charset=utf-8" },
+				redirect: "follow",
+				body: JSON.stringify(payloadData)
+			});
+			const res = await response.json();
+			if (res.status === "success") {
+				alert(`Wallet '${namaWallet}' berhasil ditambahkan!`);
+				loadDashboard(localStorage.getItem("mySheetId")); // Refresh data
+			} else {
+				alert("Gagal menambahkan Wallet: " + res.message);
+			}
+		} catch (error) {
+			alert("Terjadi kesalahan jaringan.");
+		}
+	}
 
     // ==========================================
     // 6. LOGIKA PENGATURAN (SETTINGS)
@@ -692,7 +898,7 @@
         }
     }
 
-    function saveSettings() {
+    async function saveSettings() {
         let inputVal = document.getElementById("sheetIdInput").value.trim();
         if (!inputVal) {
             alert("Harap masukkan URL atau ID Spreadsheet Anda!");
@@ -706,10 +912,39 @@
             document.getElementById("sheetIdInput").value = sheetId; 
         }
 
-        localStorage.setItem("mySheetId", sheetId);
-        initSettingsUI();
-        alert("Koneksi berhasil disimpan! Aplikasi siap digunakan.");
-        loadDashboard(sheetId); 
+        // UX Feedback: Ubah tombol menjadi status loading
+        const btnSimpan = document.querySelector("#view-settings button");
+        const originalText = btnSimpan.innerHTML;
+        btnSimpan.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyiapkan Database...';
+        btnSimpan.disabled = true;
+
+        try {
+            // Panggil API untuk membuat template otomatis di Spreadsheet
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                redirect: "follow",
+                body: JSON.stringify({ action: "INIT_DATABASE", sheetId: sheetId })
+            });
+            const res = await response.json();
+            
+            if (res.status === "success") {
+                // Jika sukses membuat template, baru simpan ID ke memori peramban
+                localStorage.setItem("mySheetId", sheetId);
+                initSettingsUI();
+                alert("Koneksi berhasil & Template Database otomatis dibuat! Aplikasi siap digunakan.");
+                loadDashboard(sheetId); 
+            } else {
+                alert("Gagal menyiapkan database: " + res.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Gagal menghubungi server. Pastikan URL Web App benar dan akses internet stabil.");
+        }
+
+        // Kembalikan tombol ke keadaan semula
+        btnSimpan.innerHTML = originalText;
+        btnSimpan.disabled = false;
     }
     </script>
 </body>
