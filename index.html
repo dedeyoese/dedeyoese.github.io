@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Cateet</title>
+	<!-- PWA Setup -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4A6EE0">
+    <link rel="apple-touch-icon" href="./icon-192.png">
     
     <!-- Pustaka Eksternal -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -372,30 +376,16 @@
                     </div>
                     <i class="fa-solid fa-chevron-right" style="color:var(--text-muted); font-size:12px;"></i>
                 </div>
+				<!-- Secara default disembunyikan (display:none) sampai browser menyatakan app bisa diinstall -->
+                <div id="pwa-install-btn" class="setting-menu-item" style="display:none; padding:15px; border-top:1px solid var(--border); justify-content:space-between; align-items:center; cursor:pointer;" onclick="installPWA()">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <i class="fa-solid fa-download" style="color:var(--success); width:20px; text-align:center;"></i> 
+                        <span style="font-size:14px; font-weight:500;">Install Aplikasi (PWA)</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color:var(--text-muted); font-size:12px;"></i>
+                </div>
             </div>
         </section>
-		<!-- KARTU INSTALL PWA (Ditambahkan di bawah kartu Database) -->
-		<div class="card" id="pwa-install-card" style="display: none; border: 2px solid var(--primary-light);">
-			<div style="display:flex; justify-content:space-between; align-items:center;">
-				<div style="display:flex; align-items:center; gap:10px;">
-					<div style="width:32px; height:32px; background:var(--primary-light); color:var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center;">
-						<i class="fa-solid fa-mobile-screen"></i>
-					</div>
-					<div>
-						<span style="font-weight:600; font-size:14px; display:block;">Install Aplikasi</span>
-						<span style="font-size:11px; color:var(--text-muted);">Pasang di Home Screen</span>
-					</div>
-				</div>
-				<button id="btn-install-pwa" style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer;">
-					Install
-				</button>
-			</div>
-			<!-- Instruksi khusus iOS -->
-			<div id="ios-install-instruction" style="display:none; font-size:11px; color:var(--text-muted); margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); line-height:1.5;">
-				Untuk <strong>iOS / iPhone</strong>: Tekan ikon <strong>Share</strong> <i class="fa-solid fa-arrow-up-from-bracket"></i> di menu bawah Safari, lalu pilih <strong>Add to Home Screen</strong> <i class="fa-solid fa-square-plus"></i>.
-			</div>
-		</div>
-
         <!-- ================= NAVIGATION BOTTOM ================= -->
         <nav class="bottom-nav">
             <a class="nav-item active" id="nav-home" onclick="switchTab('home')">
@@ -969,67 +959,67 @@
         btnSimpan.disabled = false;
     }
 	// ==========================================
-	// LOGIKA PWA & INSTALLATION (ANDROID & IOS)
+	// LOGIKA PROGRESSIVE WEB APP (PWA)
 	// ==========================================
-
-	// 1. Registrasi Service Worker
-	if ('serviceWorker' in navigator) {
-		window.addEventListener('load', () => {
-			navigator.serviceWorker.register('./sw.js')
-				.then(reg => console.log('Service Worker Registered!', reg.scope))
-				.catch(err => console.error('Service Worker Registration Failed!', err));
-		});
-	}
-
-	// 2. Logika Tombol Install
+	
 	let deferredPrompt;
-	const installCard = document.getElementById('pwa-install-card');
-	const btnInstall = document.getElementById('btn-install-pwa');
-	const iosInstruction = document.getElementById('ios-install-instruction');
-
-	// Deteksi perangkat iOS (Safari)
-	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-	// Jika iOS, langsung tampilkan kartu dengan panduan teks manual (Apple tidak izinkan tombol pop-up)
-	if (isIOS) {
-		const isStandalone = window.navigator.standalone === true;
-		if (!isStandalone) { // Jika belum di-install
-			installCard.style.display = 'block';
-			btnInstall.style.display = 'none'; // Sembunyikan tombol
-			iosInstruction.style.display = 'block'; // Tampilkan panduan teks
-		}
-	}
-
-	// Untuk Android / Chrome (Menangkap event instalasi)
+	
+	// 1. Tangkap event prompt instalasi dari browser
 	window.addEventListener('beforeinstallprompt', (e) => {
-		// Cegah browser menampilkan mini-infobar default
-		e.preventDefault();
-		// Simpan event agar bisa dipanggil lewat tombol
-		deferredPrompt = e;
-		// Tampilkan kartu install di menu Settings
-		installCard.style.display = 'block';
+	    // Mencegah prompt bawaan muncul secara otomatis
+	    e.preventDefault();
+	    
+	    // Simpan event ke dalam variabel untuk dipicu nanti saat tombol ditekan
+	    deferredPrompt = e;
+	    
+	    // Tampilkan tombol "Install Aplikasi" di menu Setting
+	    const installBtn = document.getElementById('pwa-install-btn');
+	    if(installBtn) {
+	        installBtn.style.display = 'flex';
+	    }
 	});
-
-	// Aksi saat tombol Install ditekan (Android)
-	if (btnInstall) {
-		btnInstall.addEventListener('click', async () => {
-			if (deferredPrompt) {
-				deferredPrompt.prompt(); // Munculkan pop-up instalasi native
-				const { outcome } = await deferredPrompt.userChoice;
-				if (outcome === 'accepted') {
-					console.log('User menginstall PWA');
-					installCard.style.display = 'none'; // Sembunyikan kartu setelah install
-				}
-				deferredPrompt = null;
-			}
-		});
+	
+	// 2. Fungsi yang dipanggil saat tombol di menu Setting ditekan
+	async function installPWA() {
+	    if (deferredPrompt) {
+	        // Tampilkan prompt instalasi bawaan sistem
+	        deferredPrompt.prompt();
+	        
+	        // Tunggu respons dari pengguna (apakah menekan "Install" atau "Cancel")
+	        const { outcome } = await deferredPrompt.userChoice;
+	        
+	        if (outcome === 'accepted') {
+	            console.log('Pengguna menyetujui instalasi PWA');
+	        } else {
+	            console.log('Pengguna membatalkan instalasi PWA');
+	        }
+	        
+	        // Hapus prompt yang sudah dipakai
+	        deferredPrompt = null;
+	        
+	        // Sembunyikan kembali tombol di menu Setting
+	        document.getElementById('pwa-install-btn').style.display = 'none';
+	    }
 	}
-
-	// Sembunyikan kartu jika PWA berhasil diinstall
+	
+	// 3. Deteksi jika aplikasi sudah sukses terinstall
 	window.addEventListener('appinstalled', () => {
-		installCard.style.display = 'none';
-		console.log('PWA berhasil di-install di perangkat.');
+	    document.getElementById('pwa-install-btn').style.display = 'none';
+	    console.log('Aplikasi sukses diinstall sebagai PWA');
 	});
+	
+	// 4. Daftarkan Service Worker (sw.js)
+	if ('serviceWorker' in navigator) {
+	    window.addEventListener('load', () => {
+	        navigator.serviceWorker.register('./sw.js')
+	            .then((registration) => {
+	                console.log('Service Worker berhasil didaftarkan dengan scope:', registration.scope);
+	            })
+	            .catch((error) => {
+	                console.error('Pendaftaran Service Worker gagal:', error);
+	            });
+	    });
+	}
     </script>
 </body>
 </html>
