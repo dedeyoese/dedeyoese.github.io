@@ -374,6 +374,27 @@
                 </div>
             </div>
         </section>
+		<!-- KARTU INSTALL PWA (Ditambahkan di bawah kartu Database) -->
+		<div class="card" id="pwa-install-card" style="display: none; border: 2px solid var(--primary-light);">
+			<div style="display:flex; justify-content:space-between; align-items:center;">
+				<div style="display:flex; align-items:center; gap:10px;">
+					<div style="width:32px; height:32px; background:var(--primary-light); color:var(--primary); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+						<i class="fa-solid fa-mobile-screen"></i>
+					</div>
+					<div>
+						<span style="font-weight:600; font-size:14px; display:block;">Install Aplikasi</span>
+						<span style="font-size:11px; color:var(--text-muted);">Pasang di Home Screen</span>
+					</div>
+				</div>
+				<button id="btn-install-pwa" style="padding:8px 16px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:600; font-size:12px; cursor:pointer;">
+					Install
+				</button>
+			</div>
+			<!-- Instruksi khusus iOS -->
+			<div id="ios-install-instruction" style="display:none; font-size:11px; color:var(--text-muted); margin-top:12px; padding-top:12px; border-top:1px dashed var(--border); line-height:1.5;">
+				Untuk <strong>iOS / iPhone</strong>: Tekan ikon <strong>Share</strong> <i class="fa-solid fa-arrow-up-from-bracket"></i> di menu bawah Safari, lalu pilih <strong>Add to Home Screen</strong> <i class="fa-solid fa-square-plus"></i>.
+			</div>
+		</div>
 
         <!-- ================= NAVIGATION BOTTOM ================= -->
         <nav class="bottom-nav">
