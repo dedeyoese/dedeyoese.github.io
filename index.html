@@ -947,6 +947,68 @@
         btnSimpan.innerHTML = originalText;
         btnSimpan.disabled = false;
     }
+	// ==========================================
+	// LOGIKA PWA & INSTALLATION (ANDROID & IOS)
+	// ==========================================
+
+	// 1. Registrasi Service Worker
+	if ('serviceWorker' in navigator) {
+		window.addEventListener('load', () => {
+			navigator.serviceWorker.register('./sw.js')
+				.then(reg => console.log('Service Worker Registered!', reg.scope))
+				.catch(err => console.error('Service Worker Registration Failed!', err));
+		});
+	}
+
+	// 2. Logika Tombol Install
+	let deferredPrompt;
+	const installCard = document.getElementById('pwa-install-card');
+	const btnInstall = document.getElementById('btn-install-pwa');
+	const iosInstruction = document.getElementById('ios-install-instruction');
+
+	// Deteksi perangkat iOS (Safari)
+	const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+	// Jika iOS, langsung tampilkan kartu dengan panduan teks manual (Apple tidak izinkan tombol pop-up)
+	if (isIOS) {
+		const isStandalone = window.navigator.standalone === true;
+		if (!isStandalone) { // Jika belum di-install
+			installCard.style.display = 'block';
+			btnInstall.style.display = 'none'; // Sembunyikan tombol
+			iosInstruction.style.display = 'block'; // Tampilkan panduan teks
+		}
+	}
+
+	// Untuk Android / Chrome (Menangkap event instalasi)
+	window.addEventListener('beforeinstallprompt', (e) => {
+		// Cegah browser menampilkan mini-infobar default
+		e.preventDefault();
+		// Simpan event agar bisa dipanggil lewat tombol
+		deferredPrompt = e;
+		// Tampilkan kartu install di menu Settings
+		installCard.style.display = 'block';
+	});
+
+	// Aksi saat tombol Install ditekan (Android)
+	if (btnInstall) {
+		btnInstall.addEventListener('click', async () => {
+			if (deferredPrompt) {
+				deferredPrompt.prompt(); // Munculkan pop-up instalasi native
+				const { outcome } = await deferredPrompt.userChoice;
+				if (outcome === 'accepted') {
+					console.log('User menginstall PWA');
+					installCard.style.display = 'none'; // Sembunyikan kartu setelah install
+				}
+				deferredPrompt = null;
+			}
+		});
+	}
+
+	// Sembunyikan kartu jika PWA berhasil diinstall
+	window.addEventListener('appinstalled', () => {
+		installCard.style.display = 'none';
+		console.log('PWA berhasil di-install di perangkat.');
+	});
     </script>
 </body>
 </html>
