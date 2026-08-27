@@ -3,589 +3,714 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sistem Keuangan</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
+    <title>Aplikasi Keuangan Web-Based</title>
+    
+    <!-- Pustaka Eksternal -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
-        
+        /* --- CSS VARIABLES & RESET --- */
         :root {
-            --bg-color: #f8f9fc;
-            --primary-dark: #1e1e2d;
-            --expense-color: #ff4d4f;
-            --income-color: #52c41a;
-            --transfer-color: #1890ff;
+            --bg-color: #F8F9FA;
+            --white: #FFFFFF;
+            --primary: #4A6EE0;
+            --primary-light: #EEF2FF;
+            --text-dark: #1F2937;
+            --text-muted: #6B7280;
+            --success: #2ECC71;
+            --danger: #E74C3C;
+            --warning: #F59E0B;
+            --border: #E5E7EB;
+            --shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
 
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #e9ecef; /* Background luar untuk desktop */
-            margin: 0;
-            padding: 0;
-            color: var(--primary-dark);
-        }
-
-        /* Mobile Wrapper */
-        .app-container {
-            max-width: 414px;
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { background-color: var(--bg-color); color: var(--text-dark); -webkit-font-smoothing: antialiased; }
+        
+        /* --- LAYOUT UTAMA --- */
+        #app-container {
+            max-width: 480px; /* Lebar maksimal untuk layar HP/Tablet */
             margin: 0 auto;
-            background-color: var(--bg-color);
+            background: var(--bg-color);
             min-height: 100vh;
             position: relative;
+            padding-bottom: 70px; /* Ruang untuk bottom nav */
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
-            overflow-x: hidden;
-            padding-bottom: 80px; /* space for bottom nav */
         }
 
-        /* Header / Greeting */
-        .header-section {
-            padding: 20px 20px 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .header-section h4 { font-weight: 700; margin-bottom: 2px; }
-        .header-section p { font-size: 13px; color: #6c757d; margin-bottom: 0; }
-        .bell-icon {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            border: 1px solid #e0e0e0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; color: #6c757d;
-        }
-
-        /* Wallet Cards Horizontal Scroll */
-        .wallet-scroll {
-            display: flex;
-            overflow-x: auto;
-            padding: 10px 20px;
-            gap: 15px;
-            scrollbar-width: none; /* Firefox */
-        }
-        .wallet-scroll::-webkit-scrollbar { display: none; } /* Chrome */
-        
-        .wallet-card {
-            min-width: 140px;
-            border-radius: 20px;
-            padding: 15px;
-            background: #fff;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
-            border: 1px solid #f0f0f0;
-        }
-        .wallet-card.active { border: 2px solid var(--income-color); }
-        .wallet-icon {
-            width: 35px; height: 35px; border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 15px; font-size: 16px;
-        }
-        .bg-light-success { background: #e8f5e9; color: #2e7d32; }
-        .bg-light-primary { background: #e3f2fd; color: #1565c0; }
-        .bg-light-info { background: #f3e5f5; color: #7b1fa2; }
-        
-        .wallet-card h6 { font-size: 13px; font-weight: 600; margin-bottom: 5px; }
-        .wallet-card h5 { font-size: 16px; font-weight: 700; margin-bottom: 10px; }
-        .progress-bar-custom { height: 4px; border-radius: 2px; width: 100%; background: #f0f0f0; }
-        .progress-bar-custom .fill { height: 100%; border-radius: 2px; }
-
-        /* Chart Section */
-        .chart-container { background: #fff; margin: 15px 20px; border-radius: 20px; padding: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
-        
-        /* Transaction List */
-        .trx-list { padding: 0 20px 20px; }
-        .trx-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 15px 0; border-bottom: 1px solid #f0f0f0;
-        }
-        .trx-item:last-child { border-bottom: none; }
-        .trx-icon {
-            width: 45px; height: 45px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center; font-size: 18px; margin-right: 15px;
-        }
-        .trx-details { flex-grow: 1; }
-        .trx-details h6 { margin: 0; font-size: 14px; font-weight: 600; }
-        .trx-details p { margin: 0; font-size: 12px; color: #888; }
-        .trx-amount { text-align: right; }
-        .trx-amount h6 { margin: 0; font-size: 14px; font-weight: 700; }
-        .text-expense { color: var(--expense-color); }
-        .text-income { color: var(--income-color); }
-
-        /* Input Form (Transactions Tab) */
-        .trx-type-tabs { display: flex; gap: 10px; margin-bottom: 20px; }
-        .trx-type-btn {
-            flex: 1; padding: 10px; border-radius: 12px; text-align: center;
-            border: 1px solid #e0e0e0; background: #f8f9fc; font-weight: 600; font-size: 14px;
-            color: #6c757d; cursor: pointer; transition: 0.3s;
-        }
-        .trx-type-btn.active.expense { background: #fff1f0; border-color: #ffa39e; color: var(--expense-color); }
-        .trx-type-btn.active.income { background: #f6ffed; border-color: #b7eb8f; color: var(--income-color); }
-        .trx-type-btn.active.transfer { background: #e6f7ff; border-color: #91d5ff; color: var(--transfer-color); }
-        
-        .form-control, .form-select { border-radius: 12px; padding: 12px 15px; border: 1px solid #e0e0e0; font-size: 14px; box-shadow: none !important; }
-        .btn-submit { background: var(--expense-color); color: white; border-radius: 12px; padding: 12px; font-weight: 600; width: 100%; border: none; }
-
-        /* Bottom Navigation */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 414px;
-            background: #fff; padding: 15px 20px;
-            display: flex; justify-content: space-between;
-            border-top: 1px solid #f0f0f0; border-radius: 30px 30px 0 0;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.03);
-            z-index: 1000;
-        }
-        .nav-item {
-            text-align: center; color: #a0a0a0; font-size: 12px; cursor: pointer; flex: 1;
-        }
-        .nav-item i { font-size: 20px; margin-bottom: 4px; display: block; }
-        .nav-item.active { color: #0d6efd; font-weight: 600; }
-
-        /* Page Content Toggle */
-        .page-content { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .page-content.active { display: block; }
+        /* --- SISTEM TAB (SINGLE PAGE) --- */
+        .view-section { display: none; padding: 20px; animation: fadeIn 0.3s ease; }
+        .view-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* --- HEADER & TYPOGRAPHY --- */
+        .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        h1, h2, h3 { font-weight: 700; }
+        .title-sm { font-size: 14px; font-weight: 600; color: var(--text-dark); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;}
+        .text-link { color: var(--text-muted); font-size: 12px; font-weight: 400; text-decoration: none; }
+        .icon-btn { background: var(--white); border: 1px solid var(--border); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: var(--text-dark); cursor: pointer; }
+
+        /* --- CARDS & WIDGETS --- */
+        .card { background: var(--white); border-radius: 16px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 20px; }
+        .horizontal-scroll { display: flex; overflow-x: auto; gap: 15px; padding-bottom: 10px; margin-right: -20px; padding-right: 20px; scroll-scrollbar-width: none; }
+        .horizontal-scroll::-webkit-scrollbar { display: none; }
+        
+        .wallet-card { min-width: 140px; background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 15px; box-shadow: var(--shadow); display: flex; flex-direction: column; }
+        .wallet-card.active { border-color: var(--primary); background: var(--primary-light); }
+        .wallet-icon { width: 35px; height: 35px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+        .w-cash { background: #E8F5E9; color: var(--success); }
+        .w-debit { background: #E3F2FD; color: var(--primary); }
+
+        /* --- BOTTOM NAVIGATION --- */
+        .bottom-nav { position: fixed; bottom: 0; max-width: 480px; width: 100%; background: var(--white); border-top: 1px solid var(--border); display: flex; justify-content: space-around; padding: 12px 0; z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: var(--text-muted); font-size: 11px; font-weight: 500; gap: 5px; transition: 0.2s; cursor: pointer; }
+        .nav-item i { font-size: 20px; }
+        .nav-item.active { color: var(--primary); }
+		
+		/* --- KHUSUS FORM TRANSACTIONS --- */
+        .tx-type-selector { display: flex; gap: 8px; background: var(--white); padding: 6px; border-radius: 12px; box-shadow: var(--shadow); }
+        .type-btn { flex: 1; padding: 12px 0; border: none; background: transparent; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        /* State Aktif per Tipe */
+        .type-btn.active#btn-type-Income { background: #E8F5E9; color: var(--success); }
+        .type-btn.active#btn-type-Expense { background: #FEE2E2; color: var(--danger); }
+        .type-btn.active#btn-type-Transfer { background: #E0E7FF; color: var(--primary); }
+        .type-btn i { font-size: 14px; }
+        .type-btn:not(.active) i { color: var(--text-muted) !important; } /* Icon abu-abu jika tidak aktif */
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-dark); }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; background: var(--white); box-sizing: border-box; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); }
+        
+        .input-with-prefix { display: flex; align-items: center; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--white); }
+        .input-with-prefix span { padding: 12px 15px; background: #F9FAFB; font-weight: 600; color: var(--text-dark); font-size: 14px; border-right: 1px solid var(--border); }
+        .input-with-prefix input { border: none; flex: 1; border-radius: 0; padding-left: 10px; }
+        
+        .upload-area { border: 1px dashed #CBD5E1; border-radius: 8px; padding: 15px; text-align: center; cursor: pointer; background: #F8FAFC; transition: 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .upload-area:hover { border-color: var(--primary); }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-
-    <!-- TAB: HOME -->
-    <div id="tab-home" class="page-content active">
-        <div class="header-section">
-            <div>
-                <h4 id="greeting-name">Hi, User 👋</h4>
-                <p id="school-name">Sistem Keuangan</p>
-            </div>
-            <div class="bell-icon"><i class="fa-regular fa-bell"></i></div>
-        </div>
-
-        <div class="d-flex justify-content-between px-3 mt-2">
-            <h6 class="fw-bold mb-0">My Wallets</h6>
-            <a href="#" class="text-decoration-none text-muted" style="font-size: 13px;" onclick="switchTab('wallets')">Lihat Semua ></a>
-        </div>
+    <div id="app-container">
         
-        <div class="wallet-scroll" id="home-wallets-container">
-            <!-- Wallets injected by JS -->
-            <div class="text-center w-100 text-muted"><div class="spinner-border spinner-border-sm"></div> Memuat...</div>
-        </div>
-
-        <div class="chart-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0">Overview 7 Hari Terakhir</h6>
-                <select class="form-select form-select-sm w-auto border-0 bg-light rounded-pill"><option>7 Hari</option></select>
-            </div>
-            <div style="position: relative; height: 180px; width: 100%;">
-				<canvas id="overviewChart"></canvas>
-			</div>
-        </div>
-
-        <div class="trx-list mt-2">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h6 class="fw-bold mb-0">Transaksi Terakhir</h6>
-                <a href="#" class="text-decoration-none text-muted" style="font-size: 13px;" onclick="switchTab('transactions')">Lihat Semua</a>
-            </div>
-            <div id="home-trx-container">
-                <!-- Transactions injected by JS -->
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB: WALLETS (Detail) -->
-    <div id="tab-wallets" class="page-content">
-        <div class="header-section">
-            <h3 class="fw-bold">Wallets</h3>
-        </div>
-        <p class="px-3 text-muted" style="font-size:14px; margin-top:-10px;">Kelola semua sumber keuanganmu</p>
-        
-        <div class="wallet-scroll" id="detail-wallets-container">
-             <!-- Wallets injected by JS -->
-        </div>
-
-        <div class="chart-container mt-3" style="border: 2px solid #e8f5e9; background: #fafdfa;">
-            <div class="d-flex align-items-center mb-3">
-                <div class="wallet-icon bg-light-success mb-0 me-3"><i class="fa-solid fa-wallet"></i></div>
-                <div><h6 class="fw-bold mb-0">Detail Wallet Utama</h6><small class="text-muted">Ringkasan hari ini</small></div>
-            </div>
-            <div class="row text-center mb-3">
-                <div class="col-4 border-end">
-                    <small class="text-muted d-block">Sisa Saldo</small>
-                    <strong class="text-success" id="det-sisa" style="font-size:14px;">Rp 0</strong>
+        <!-- ================= VIEW: HOME ================= -->
+        <section id="view-home" class="view-section active">
+            <header class="header-top">
+                <div>
+                    <h2>Hi, Dede 👋</h2>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Kelola keuanganmu dengan bijak</p>
                 </div>
-                <div class="col-4 border-end">
-                    <small class="text-muted d-block">Terpakai</small>
-                    <strong class="text-danger" style="font-size:14px;">Rp 0</strong>
+                <div class="icon-btn">
+                    <i class="fa-regular fa-bell"></i>
                 </div>
-                <div class="col-4">
-                    <small class="text-muted d-block">Pemasukan</small>
-                    <strong class="text-success" style="font-size:14px;">Rp 0</strong>
+            </header>
+
+            <div class="title-sm">
+                <span>My Wallets</span>
+                <a href="#" class="text-link" onclick="switchTab('wallets')">Lihat Semua ></a>
+            </div>
+            
+            <!-- Tempat merender kartu wallet statis sementara -->
+            <div class="horizontal-scroll" id="home-wallets">
+                <div class="wallet-card w-cash">
+                    <div class="wallet-icon w-cash"><i class="fa-solid fa-money-bill"></i></div>
+                    <span style="font-size: 13px; font-weight: 600;">Cash</span>
+                    <strong style="font-size: 16px; margin-top: 5px;">Rp 1.250.000</strong>
+                </div>
+                <div class="wallet-card w-debit">
+                    <div class="wallet-icon w-debit"><i class="fa-solid fa-credit-card"></i></div>
+                    <span style="font-size: 13px; font-weight: 600;">Debit</span>
+                    <strong style="font-size: 16px; margin-top: 5px;">Rp 2.850.000</strong>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- TAB: TRANSACTIONS (Input Form) -->
-    <div id="tab-transactions" class="page-content">
-        <div class="header-section">
-            <h3 class="fw-bold">Transactions</h3>
-        </div>
-        <p class="px-3 text-muted" style="font-size:14px; margin-top:-10px;">Catat setiap pemasukan dan pengeluaran</p>
+            <!-- Tempat merender chart nantinya -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="title-sm">
+                    <span>Overview 7 Hari Terakhir</span>
+                    <select style="border:none; background:#F3F4F6; border-radius:12px; padding:4px 8px; font-size:11px;"><option>7 Hari</option></select>
+                </div>
+                <div style="height: 150px; display: flex; align-items:center; justify-content:center; background:#F8F9FA; border-radius:8px; color: var(--text-muted); font-size: 12px;">
+					<canvas id="weeklyChart"></canvas>
+				</div>
+            </div>
+            
+            <div class="title-sm" style="margin-top: 25px;">
+                <span>Transaksi Terakhir</span>
+                <a href="#" class="text-link" onclick="switchTab('transactions')">Lihat Semua ></a>
+            </div>
+            <div id="home-recent-tx">
+                <p style="font-size: 12px; color: var(--text-muted); text-align: center;">Memuat transaksi...</p>
+            </div>
+        </section>
 
-        <div class="px-3">
-            <div class="trx-type-tabs">
-                <div class="trx-type-btn income" onclick="setTrxType('Income', this)"><i class="fa-solid fa-arrow-down me-1"></i> Income</div>
-                <div class="trx-type-btn active expense" onclick="setTrxType('Expense', this)"><i class="fa-solid fa-arrow-up me-1"></i> Expense</div>
-                <div class="trx-type-btn transfer" onclick="setTrxType('Transfer', this)"><i class="fa-solid fa-right-left me-1"></i> Transfer</div>
+        <!-- ================= VIEW: WALLETS ================= -->
+        <section id="view-wallets" class="view-section">
+            <header class="header-top">
+                <div>
+                    <h2>Wallets</h2>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Kelola semua sumber keuanganmu</p>
+                </div>
+                <div class="icon-btn"><i class="fa-solid fa-plus"></i></div>
+            </header>
+            <p style="text-align:center; color:var(--text-muted); margin-top: 50px;">Halaman Detail Wallets (Tahap 2)</p>
+        </section>
+
+        <!-- ================= VIEW: TRANSACTIONS ================= -->
+        <section id="view-transactions" class="view-section">
+            <header class="header-top" style="margin-bottom:15px;">
+                <div>
+                    <h2>Transactions</h2>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Catat setiap pemasukan, pengeluaran dan transfer</p>
+                </div>
+            </header>
+
+            <!-- 1. Tipe Transaksi (Segmented Control) -->
+            <div class="tx-type-selector">
+                <button class="type-btn" id="btn-type-Income" onclick="setTxType('Income')">
+                    <i class="fa-solid fa-arrow-down"></i> Income
+                </button>
+                <button class="type-btn active" id="btn-type-Expense" onclick="setTxType('Expense')">
+                    <i class="fa-solid fa-arrow-up"></i> Expense
+                </button>
+                <button class="type-btn" id="btn-type-Transfer" onclick="setTxType('Transfer')">
+                    <i class="fa-solid fa-money-bill-transfer"></i> Transfer
+                </button>
             </div>
 
-            <div class="card border-0 shadow-sm rounded-4 p-3 mb-4">
-                <form id="formTransaction">
-                    <input type="hidden" id="inpType" value="Expense">
+            <!-- 2. Form Input Card -->
+            <div class="card" style="margin-top: 20px;">
+                <h3 id="form-title" style="margin-bottom: 15px; font-size: 15px;">Input Expense</h3>
+                
+                <div class="form-group">
+                    <label>Nominal</label>
+                    <div class="input-with-prefix">
+                        <span>Rp</span>
+                        <input type="number" id="txNominal" placeholder="150000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Kategori</label>
+                    <select id="txKategori">
+                        <option value="Food & Drink">🍔 Food & Drink</option>
+                        <option value="Shopping" selected>🛒 Shopping</option>
+                        <option value="Transportasi">🚗 Transportasi</option>
+                        <option value="Gaji Bulanan">💰 Gaji Bulanan</option>
+                        <option value="Lainnya">📦 Lainnya</option>
+                    </select>
+                </div>
+
+                <!-- Wallet Dinamis: Muncul/Hilang sesuai Tipe -->
+                <div class="form-group" id="group-wallet-asal">
+                    <label>Sumber Dana (Wallet Asal)</label>
+                    <select id="txWalletAsal"></select>
+                </div>
+                <div class="form-group" id="group-wallet-tujuan" style="display:none;">
+                    <label>Tujuan Dana (Wallet Tujuan)</label>
+                    <select id="txWalletTujuan"></select>
+                </div>
+
+                <div class="form-group">
+                    <label>Tanggal</label>
+                    <input type="date" id="txTanggal">
+                </div>
+
+                <div class="form-group">
+                    <label>Keterangan <span style="font-weight:normal; color:var(--text-muted);">(Opsional)</span></label>
+                    <input type="text" id="txCatatan" placeholder="Belanja keperluan rumah tangga...">
+                </div>
+
+                <div class="form-group">
+                    <label>Photo Nota / Struk <span style="font-weight:normal; color:var(--text-muted);">(Opsional)</span></label>
                     
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size: 13px;">Nominal</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0 border-radius-left">Rp</span>
-                            <input type="number" class="form-control border-start-0 ps-0" id="inpNominal" placeholder="0" required>
+                    <div style="display: flex; gap: 10px;">
+                        <!-- Preview Gambar (Tersembunyi by default) -->
+                        <div id="image-preview-container" style="display:none; position:relative;">
+                            <img id="image-preview" src="" style="width:70px; height:70px; object-fit:cover; border-radius:8px; border:1px solid var(--border);">
+                            <div onclick="removeImage()" style="position:absolute; top:-6px; right:-6px; background:var(--text-muted); color:white; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; cursor:pointer;">
+                                <i class="fa-solid fa-xmark"></i>
+                            </div>
+                        </div>
+
+                        <!-- Area Upload -->
+                        <div class="upload-area" onclick="document.getElementById('txStruk').click()" style="flex:1;">
+                            <i class="fa-solid fa-camera" style="color:var(--primary); font-size: 16px;"></i>
+                            <span style="display:block; font-size:13px; font-weight:600; color:var(--primary); margin-top:5px;">Tambah Foto</span>
+                            <span style="font-size:11px; color:var(--text-muted);">PNG, JPG maks. 2MB</span>
+                            <input type="file" id="txStruk" accept="image/png, image/jpeg" style="display:none;" onchange="previewImage(event)">
                         </div>
                     </div>
+                </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size: 13px;">Kategori</label>
-                        <select class="form-select" id="inpCategory" required>
-                            <option value="Food & Drink">🍽️ Food & Drink</option>
-                            <option value="Shopping" selected>🛒 Shopping</option>
-                            <option value="Transportasi">⛽ Transportasi</option>
-                            <option value="Gaji/Income">💰 Gaji / Pemasukan</option>
-                            <option value="Transfer">🔄 Transfer</option>
-                            <option value="Lainnya">📦 Lainnya</option>
-                        </select>
-                    </div>
+                <button id="btnSubmitTx" onclick="submitTransaction()" style="width:100%; padding:14px; background:var(--danger); color:white; border:none; border-radius:8px; font-weight:600; font-size: 14px; cursor:pointer; margin-top:10px; transition:0.3s;">
+                    Simpan Transaksi
+                </button>
+            </div>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size: 13px;">Wallet Sumber/Tujuan</label>
-                        <select class="form-select" id="inpWallet" required>
-                            <option value="W1">Cash</option>
-                            <option value="W2">Debit</option>
-                            <option value="W3">Savings</option>
-                        </select>
-                    </div>
+            <!-- 3. Daftar Transaksi Log -->
+            <div style="margin-top: 25px;">
+                <div class="title-sm" style="margin-bottom: 15px;">
+                    <span>Daftar Transaksi</span>
+                    <select style="border:1px solid var(--border); background:var(--white); border-radius:8px; padding:6px 10px; font-size:12px; font-weight: 500; color:var(--text-dark);"><option>Semua Wallet</option></select>
+                </div>
+                <!-- Log List dirender lewat JS -->
+                <div id="tx-history-list" style="padding-bottom: 30px;">
+                    <p style="text-align:center; font-size:12px; color:var(--text-muted);">Memuat riwayat...</p>
+                </div>
+            </div>
+        </section>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size: 13px;">Tanggal</label>
-                        <input type="date" class="form-control" id="inpDate" required>
-                    </div>
+        <!-- ================= VIEW: SETTINGS ================= -->
+        <section id="view-settings" class="view-section">
+            <header class="header-top">
+                <div>
+                    <h2>Settings</h2>
+                    <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">Atur preferensi dan data keuanganmu</p>
+                </div>
+            </header>
 
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size: 13px;">Keterangan (Opsional)</label>
-                        <input type="text" class="form-control" id="inpDesc" placeholder="Belanja keperluan...">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label fw-semibold" style="font-size: 13px;">Photo Nota (Opsional UI)</label>
-                        <div class="border border-dashed rounded-3 p-3 text-center text-primary" style="background: #f8f9fc; border-style: dashed !important; border-color: #cbd5e1 !important;">
-                            <i class="fa-solid fa-camera mb-2"></i><br>
-                            <span style="font-size: 12px;">Tambah Foto (Maks 2MB)</span>
+            <!-- KARTU KONEKSI SPREADSHEET -->
+            <div class="card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="width:32px; height:32px; background:#E8F5E9; color:var(--success); border-radius:8px; display:flex; align-items:center; justify-content:center;">
+                            <i class="fa-solid fa-link"></i>
                         </div>
+                        <span style="font-weight:600; font-size:14px;">Koneksi Database</span>
                     </div>
-
-                    <button type="submit" class="btn-submit" id="btnSubmitTrx">Simpan Transaksi</button>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB: SETTINGS -->
-    <div id="tab-setting" class="page-content">
-        <div class="header-section">
-            <h3 class="fw-bold">Settings</h3>
-        </div>
-        
-        <div class="px-3 pb-5">
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-center">
-                <div class="mb-3">
-                    <img src="https://ui-avatars.com/api/?name=User&background=0D8ABC&color=fff" class="rounded-circle" width="70" alt="Avatar">
+                    <!-- Badge Status -->
+                    <span id="koneksi-status" style="font-size:11px; padding:4px 8px; border-radius:12px; background:#FEE2E2; color:var(--danger); font-weight:600;">Terputus</span>
                 </div>
-                <h5 class="fw-bold mb-0">Pengaturan Aplikasi</h5>
-                <p class="text-muted" style="font-size: 13px;">Hubungkan ke Google Apps Script</p>
+                
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Tempel URL atau ID Google Spreadsheet Anda.</p>
+                
+                <input type="text" id="sheetIdInput" placeholder="https://docs.google.com/spreadsheets/d/..." style="width:100%; padding:12px; border-radius:8px; border:1px solid var(--border); margin-bottom:10px; font-size:12px; background:#F9FAFB;">
+                
+                <button onclick="saveSettings()" style="width:100%; padding:12px; background:var(--primary); color:white; border:none; border-radius:8px; font-weight:600; cursor:pointer;">
+                    Simpan Koneksi
+                </button>
             </div>
 
-            <form id="formSettings">
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">URL Google Apps Script</label>
-                    <input type="url" class="form-control" id="setAppUrl" placeholder="https://script.google.com/macros/s/.../exec" required>
-                    <small class="text-danger" style="font-size:11px;">*Wajib diisi agar aplikasi berfungsi</small>
+            <!-- KARTU MENU LAINNYA (Placeholder UI) -->
+            <div class="card" style="padding:0;">
+                <div class="setting-menu-item" style="padding:15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <i class="fa-solid fa-user" style="color:var(--primary); width:20px; text-align:center;"></i> 
+                        <span style="font-size:14px; font-weight:500;">Profil & Nama Akun</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color:var(--text-muted); font-size:12px;"></i>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Nama Pengguna</label>
-                    <input type="text" class="form-control" id="setUserName" placeholder="Nama Anda" required>
+                <div class="setting-menu-item" style="padding:15px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <i class="fa-solid fa-wallet" style="color:var(--primary); width:20px; text-align:center;"></i> 
+                        <span style="font-size:14px; font-weight:500;">Pengaturan Wallets</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color:var(--text-muted); font-size:12px;"></i>
                 </div>
-                <div class="mb-3">
-                    <label class="form-label fw-semibold">Identitas Sekolah / Instansi</label>
-                    <input type="text" class="form-control" id="setSchoolName" placeholder="Contoh: SMA Negeri 1" required>
+                <div class="setting-menu-item" style="padding:15px; display:flex; justify-content:space-between; align-items:center; cursor:pointer;">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <i class="fa-solid fa-cloud-arrow-down" style="color:var(--primary); width:20px; text-align:center;"></i> 
+                        <span style="font-size:14px; font-weight:500;">Backup & Restore (CSV)</span>
+                    </div>
+                    <i class="fa-solid fa-chevron-right" style="color:var(--text-muted); font-size:12px;"></i>
                 </div>
-                <button type="submit" class="btn btn-primary w-100 rounded-3 py-2 fw-bold">Simpan Pengaturan</button>
-            </form>
-        </div>
+            </div>
+        </section>
+
+        <!-- ================= NAVIGATION BOTTOM ================= -->
+        <nav class="bottom-nav">
+            <a class="nav-item active" id="nav-home" onclick="switchTab('home')">
+                <i class="fa-solid fa-house"></i><span>Home</span>
+            </a>
+            <a class="nav-item" id="nav-wallets" onclick="switchTab('wallets')">
+                <i class="fa-solid fa-wallet"></i><span>Wallets</span>
+            </a>
+            <a class="nav-item" id="nav-transactions" onclick="switchTab('transactions')">
+                <i class="fa-solid fa-money-bill-transfer"></i><span>Transactions</span>
+            </a>
+            <a class="nav-item" id="nav-settings" onclick="switchTab('settings')">
+                <i class="fa-solid fa-gear"></i><span>Setting</span>
+            </a>
+        </nav>
+
     </div>
 
-    <!-- Bottom Navigation -->
-    <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home')" id="nav-home">
-            <i class="fa-solid fa-house"></i>Home
-        </div>
-        <div class="nav-item" onclick="switchTab('wallets')" id="nav-wallets">
-            <i class="fa-solid fa-wallet"></i>Wallets
-        </div>
-        <div class="nav-item" onclick="switchTab('transactions')" id="nav-transactions">
-            <i class="fa-solid fa-file-invoice-dollar"></i>Transactions
-        </div>
-        <div class="nav-item" onclick="switchTab('setting')" id="nav-setting">
-            <i class="fa-solid fa-gear"></i>Setting
-        </div>
-    </div>
+    <!-- SCRIPT LOGIKA FRONTEND -->
+    <script>
+// ==========================================
+    // 1. KONFIGURASI SISTEM & STATE GLOBAL
+    // ==========================================
+    const API_URL = "https://script.google.com/macros/s/AKfycbw3ZQklgfJ4C0IDofDUdwTp_gxYOBSXQlreAzfCHpwLLHbyE3nFdT1I5aMs8fyqFj24jA/exec";
+    let chartInstance = null; 
+    let currentTxType = 'Expense'; // Variabel Global aman diletakkan di paling atas
 
-</div>
+    // ==========================================
+    // 2. INISIALISASI AWAL KETIKA HALAMAN DIBUKA
+    // ==========================================
+    window.onload = () => {
+        document.getElementById("txTanggal").valueAsDate = new Date();
+        initSettingsUI();
 
-<!-- JAVASCRIPT LOGIC -->
-<script>
-    // Utils & State
-    let APP_URL = localStorage.getItem('API_URL') || '';
-    let globalData = { wallets: [], transactions: [] };
-
-    // Format Rupiah
-    const formatRp = (angka) => {
-        return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(angka);
+        const savedId = localStorage.getItem("mySheetId");
+        if(savedId) {
+            loadDashboard(savedId);
+        } else {
+            const historyContainer = document.getElementById("tx-history-list");
+            if (historyContainer) {
+                historyContainer.innerHTML = "<p style='text-align:center; font-size:12px;'>Silakan atur koneksi Spreadsheet di menu Setting terlebih dahulu.</p>";
+            }
+        }
     };
-    
-    // Set Date Today in Form
-    document.getElementById('inpDate').valueAsDate = new Date();
 
-    // Tab Navigation Switcher
-    function switchTab(tabId) {
-        document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    // ==========================================
+    // 3. LOGIKA ANTARMUKA (UI) & ROUTING
+    // ==========================================
+    function switchTab(tabName) {
+        document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
         
-        document.getElementById(`tab-${tabId}`).classList.add('active');
-        document.getElementById(`nav-${tabId}`).classList.add('active');
-
-        if(tabId === 'home' && APP_URL) loadData();
-    }
-
-    // Set Transaction Type UI
-    function setTrxType(type, element) {
-        document.querySelectorAll('.trx-type-btn').forEach(el => el.classList.remove('active'));
-        element.classList.add('active');
-        document.getElementById('inpType').value = type;
+        document.getElementById('view-' + tabName).classList.add('active');
+        document.getElementById('nav-' + tabName).classList.add('active');
         
-        let btn = document.getElementById('btnSubmitTrx');
-        if(type === 'Expense') { btn.style.backgroundColor = 'var(--expense-color)'; }
-        else if(type === 'Income') { btn.style.backgroundColor = 'var(--income-color)'; }
-        else { btn.style.backgroundColor = 'var(--transfer-color)'; }
-    }
-
-    // Save Settings
-    document.getElementById('formSettings').addEventListener('submit', function(e) {
-        e.preventDefault();
-        APP_URL = document.getElementById('setAppUrl').value;
-        localStorage.setItem('API_URL', APP_URL);
-        localStorage.setItem('USER_NAME', document.getElementById('setUserName').value);
-        localStorage.setItem('SCHOOL_NAME', document.getElementById('setSchoolName').value);
-        
-        applySettings();
-        Swal.fire('Tersimpan!', 'Pengaturan berhasil disimpan', 'success');
-        
-        if(APP_URL) loadData();
-    });
-
-    function applySettings() {
-        document.getElementById('setAppUrl').value = APP_URL;
-        document.getElementById('setUserName').value = localStorage.getItem('USER_NAME') || 'Alex';
-        document.getElementById('setSchoolName').value = localStorage.getItem('SCHOOL_NAME') || 'Kelola keuanganmu';
-        
-        document.getElementById('greeting-name').innerText = `Hi, ${localStorage.getItem('USER_NAME') || 'Alex'} 👋`;
-        document.getElementById('school-name').innerText = localStorage.getItem('SCHOOL_NAME') || 'Kelola keuanganmu';
-    }
-
-    // Load Data from GAS
-    async function loadData() {
-        if(!APP_URL) {
-            Swal.fire('Perhatian', 'Silakan masukkan URL Google Apps Script di tab Setting terlebih dahulu.', 'warning');
-            switchTab('setting');
-            return;
+        if (tabName === 'home') {
+            const sheetId = localStorage.getItem("mySheetId");
+            if(sheetId) loadDashboard(sheetId);
         }
+    }
 
+    function setTxType(type) {
+        currentTxType = type;
+        
+        document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById('btn-type-' + type).classList.add('active');
+        
+        const formTitle = document.getElementById('form-title');
+        const btnSubmit = document.getElementById('btnSubmitTx');
+        const groupAsal = document.getElementById('group-wallet-asal');
+        const groupTujuan = document.getElementById('group-wallet-tujuan');
+        
+        formTitle.innerText = `Input ${type}`;
+        
+        if (type === 'Expense') {
+            btnSubmit.style.background = 'var(--danger)'; 
+            groupAsal.style.display = 'block';
+            groupTujuan.style.display = 'none';
+        } else if (type === 'Income') {
+            btnSubmit.style.background = 'var(--success)'; 
+            groupAsal.style.display = 'none';
+            groupTujuan.style.display = 'block';
+        } else { 
+            btnSubmit.style.background = 'var(--primary)'; 
+            groupAsal.style.display = 'block';
+            groupTujuan.style.display = 'block';
+        }
+    }
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview-container').style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeImage() {
+        document.getElementById('txStruk').value = ""; 
+        document.getElementById('image-preview-container').style.display = 'none';
+    }
+
+    // ==========================================
+    // 4. LOGIKA PENGAMBILAN & PERENDERAN DATA (READ)
+    // ==========================================
+    async function loadDashboard(sheetId) {
         try {
-            const response = await fetch(APP_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'getData' })
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                redirect: "follow",
+                body: JSON.stringify({ action: "GET_DASHBOARD", sheetId: sheetId })
             });
-            const res = await response.json();
             
-            if(res.status === 'success') {
-                globalData = res.data;
-                renderWallets(globalData.wallets);
-                renderTransactions(globalData.transactions);
-                renderChart(globalData.transactions);
+            const res = await response.json();
+            if(res.status === "success") {
+                renderDashboard(res.data);
+            } else {
+                console.error("Error API:", res.message);
             }
         } catch (error) {
-            console.error(error);
-            Swal.fire('Error', 'Gagal mengambil data dari server', 'error');
+            console.error("Gagal memuat data:", error);
         }
     }
 
-    // Render Wallets (Home & Wallets Tab)
-    function renderWallets(wallets) {
-        let html = '';
-        let totalAll = wallets.reduce((sum, w) => sum + parseFloat(w.balance), 0);
+    function renderDashboard(data) {
+        // A. Render Kartu Wallets
+        const wContainer = document.getElementById("home-wallets");
+        wContainer.innerHTML = ""; 
+        const colors = [{bg: '#E8F5E9', text: '#2ECC71', icon: 'fa-money-bill'}, {bg: '#E3F2FD', text: '#4A6EE0', icon: 'fa-credit-card'}, {bg: '#F3E5F5', text: '#9B59B6', icon: 'fa-piggy-bank'}];
         
-        let walletOptions = '';
-
-        wallets.forEach(w => {
-            let percentage = totalAll > 0 ? Math.round((w.balance / totalAll) * 100) : 0;
-            let iconClass = w.name.toLowerCase() === 'cash' ? 'fa-wallet bg-light-success' : 
-                            (w.name.toLowerCase() === 'debit' ? 'fa-credit-card bg-light-primary' : 'fa-piggy-bank bg-light-info');
-            let colorHex = w.color === 'success' ? '#52c41a' : (w.color === 'primary' ? '#1890ff' : '#7b1fa2');
-
-            html += `
-            <div class="wallet-card">
-                <div class="wallet-icon ${iconClass}"><i class="fa-solid"></i></div>
-                <h6 style="color: ${colorHex}">${w.name}</h6>
-                <h5>${formatRp(w.balance)}</h5>
-                <p style="font-size:11px; margin-bottom:5px; color:#888;">${percentage}% dari total</p>
-                <div class="progress-bar-custom">
-                    <div class="fill" style="width: ${percentage}%; background-color: ${colorHex};"></div>
-                </div>
-            </div>`;
-            
-            walletOptions += `<option value="${w.id}">${w.name} (${formatRp(w.balance)})</option>`;
+        data.wallets.forEach((w, index) => {
+            let style = colors[index % colors.length];
+            wContainer.innerHTML += `
+                <div class="wallet-card">
+                    <div class="wallet-icon" style="background:${style.bg}; color:${style.text};"><i class="fa-solid ${style.icon}"></i></div>
+                    <span style="font-size: 13px; font-weight: 600;">${w.nama}</span>
+                    <strong style="font-size: 16px; margin-top: 5px;">Rp ${w.saldoAkhir.toLocaleString('id-ID')}</strong>
+                </div>`;
         });
 
-        document.getElementById('home-wallets-container').innerHTML = html;
-        document.getElementById('detail-wallets-container').innerHTML = html;
-        document.getElementById('inpWallet').innerHTML = walletOptions;
-
-        // Update detail mockup
-        if(wallets.length > 0) document.getElementById('det-sisa').innerText = formatRp(wallets[0].balance);
-    }
-
-    // Render Transactions (Home Tab)
-    function renderTransactions(trxList) {
-        let html = '';
-        trxList.slice(0,5).forEach(t => {
-            let isExpense = t.type === 'Expense';
-            let icon = 'fa-receipt text-secondary bg-light';
-            if(t.category.includes('Food')) icon = 'fa-utensils text-warning bg-warning bg-opacity-10';
-            else if(t.category.includes('Shopping')) icon = 'fa-cart-shopping text-danger bg-danger bg-opacity-10';
-            else if(t.category.includes('Gaji') || t.type === 'Income') icon = 'fa-arrow-down text-success bg-success bg-opacity-10';
-            else if(t.category.includes('Transport')) icon = 'fa-gas-pump text-primary bg-primary bg-opacity-10';
-            else if(t.type === 'Transfer') icon = 'fa-right-left text-info bg-info bg-opacity-10';
-
-            // Format date string to dd MMM yyyy
-            let d = new Date(t.date);
-            let dateStr = `${d.getDate()} ${d.toLocaleString('id-ID', {month:'short'})} ${d.getFullYear()}`;
-
-            html += `
-            <div class="trx-item">
-                <div class="trx-icon ${icon.split(' ').slice(1).join(' ')}"><i class="fa-solid ${icon.split(' ')[0]}"></i></div>
-                <div class="trx-details">
-                    <h6>${t.desc || t.category}</h6>
-                    <p>${t.category} • ${dateStr}</p>
-                </div>
-                <div class="trx-amount">
-                    <h6 class="${isExpense ? 'text-expense' : 'text-income'}">${isExpense ? '-' : '+'} ${formatRp(t.nominal)}</h6>
-                </div>
-            </div>`;
-        });
-        
-        if(trxList.length === 0) html = '<p class="text-center text-muted">Belum ada transaksi.</p>';
-        document.getElementById('home-trx-container').innerHTML = html;
-    }
-
-    // Handle Submit Transaction
-    document.getElementById('formTransaction').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        if(!APP_URL) return Swal.fire('Error', 'Setup URL API di tab setting dulu!', 'error');
-
-        const btn = document.getElementById('btnSubmitTrx');
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Menyimpan...';
-        btn.disabled = true;
-
-        const payload = {
-            action: 'addTransaction',
-            type: document.getElementById('inpType').value,
-            nominal: document.getElementById('inpNominal').value,
-            category: document.getElementById('inpCategory').value,
-            wallet: document.getElementById('inpWallet').value,
-            date: document.getElementById('inpDate').value,
-            desc: document.getElementById('inpDesc').value
-        };
-
-        try {
-            const response = await fetch(APP_URL, {
-                method: 'POST',
-                body: JSON.stringify(payload)
+        // B. Update Dropdown Wallet di Form Transaksi
+        const elWalletAsal = document.getElementById("txWalletAsal");
+        const elWalletTujuan = document.getElementById("txWalletTujuan");
+        if (elWalletAsal && elWalletTujuan) {
+            let optionsHTML = '';
+            data.wallets.forEach(w => {
+                optionsHTML += `<option value="${w.nama}">${w.nama}</option>`;
             });
-            const res = await response.json();
-            
-            if(res.status === 'success') {
-                Swal.fire('Berhasil!', 'Transaksi berhasil dicatat', 'success');
-                document.getElementById('formTransaction').reset();
-                document.getElementById('inpDate').valueAsDate = new Date();
-                loadData(); // Refresh Data
-                switchTab('home'); // Kembali ke home
-            }
-        } catch (error) {
-            Swal.fire('Gagal', 'Terjadi kesalahan jaringan', 'error');
-        } finally {
-            btn.innerHTML = 'Simpan Transaksi';
-            btn.disabled = false;
+            elWalletAsal.innerHTML = optionsHTML;
+            elWalletTujuan.innerHTML = optionsHTML;
         }
-    });
 
-    // Render Chart.js
-    let myChart = null;
-    function renderChart(trxList) {
-        const ctx = document.getElementById('overviewChart').getContext('2d');
-        if(myChart) myChart.destroy();
+        // C. Render Transaksi Terakhir (Home)
+        const rContainer = document.getElementById("home-recent-tx");
+        rContainer.innerHTML = "";
+        if(data.recent.length === 0) {
+            rContainer.innerHTML = "<p style='text-size:12px; text-align:center;'>Belum ada transaksi.</p>";
+        } else {
+            data.recent.forEach(tx => {
+                let isIncome = tx.jenis === "Income";
+                let isTransfer = tx.jenis === "Transfer";
+                let color = isIncome ? 'var(--success)' : (isTransfer ? 'var(--primary)' : 'var(--danger)');
+                let sign = isIncome ? '+' : (isTransfer ? '🔄' : '-');
+                let icon = isIncome ? 'fa-arrow-down' : (isTransfer ? 'fa-money-bill-transfer' : 'fa-arrow-up');
+                
+                rContainer.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:10px;">
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="width:35px; height:35px; border-radius:50%; background:#F3F4F6; display:flex; align-items:center; justify-content:center; color:${color};"><i class="fa-solid ${icon}"></i></div>
+                            <div>
+                                <div style="font-size:14px; font-weight:600;">${tx.kategori}</div>
+                                <div style="font-size:11px; color:var(--text-muted);">${tx.walletAsal || tx.walletTujuan} • ${tx.tanggal}</div>
+                            </div>
+                        </div>
+                        <div style="color:${color}; font-weight:600; font-size:14px;">${sign} Rp ${tx.nominal.toLocaleString('id-ID')}</div>
+                    </div>`;
+            });
+        }
 
-        // Data dummy untuk visualisasi meniru gambar (Kenyataannya harus di-grouping per tanggal dari trxList)
-        const labels = ['7 Mei', '8 Mei', '9 Mei', '10 Mei', '11 Mei', '12 Mei', '13 Mei'];
-        const dataIncome = [1000000, 950000, 1400000, 1100000, 900000, 1150000, 1250000];
-        const dataExpense = [500000, 650000, 900000, 600000, 500000, 700000, 800000];
+        // D. Render Daftar Riwayat Log (Di Tab Transactions)
+        const historyContainer = document.getElementById("tx-history-list");
+        if (historyContainer) {
+            historyContainer.innerHTML = "";
+            if (data.recent.length === 0) {
+                historyContainer.innerHTML = "<p style='text-align:center; font-size:12px; color:var(--text-muted);'>Belum ada transaksi yang tercatat.</p>";
+            } else {
+                data.recent.slice(0, 10).forEach(tx => {
+                    let isIncome = tx.jenis === "Income";
+                    let isTransfer = tx.jenis === "Transfer";
+                    let color = isIncome ? 'var(--success)' : (isTransfer ? 'var(--primary)' : 'var(--danger)');
+                    let sign = isIncome ? '+' : (isTransfer ? '🔄' : '-');
+                    let icon = isIncome ? 'fa-arrow-down' : (isTransfer ? 'fa-money-bill-transfer' : 'fa-arrow-up');
+                    let bgIcon = isIncome ? '#E8F5E9' : (isTransfer ? '#E0E7FF' : '#FEE2E2');
+                    let walletKeterangan = isTransfer ? `${tx.walletAsal} ➔ ${tx.walletTujuan}` : (isIncome ? tx.walletTujuan : tx.walletAsal);
 
-        myChart = new Chart(ctx, {
+                    historyContainer.innerHTML += `
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; background:var(--white); padding:12px; border-radius:12px; border:1px solid var(--border);">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div style="width:40px; height:40px; border-radius:50%; background:${bgIcon}; display:flex; align-items:center; justify-content:center; color:${color}; font-size:14px;">
+                                    <i class="fa-solid ${icon}"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size:14px; font-weight:600; color:var(--text-dark);">${tx.kategori}</div>
+                                    <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">${walletKeterangan} • ${tx.tanggal}</div>
+                                </div>
+                            </div>
+                            <div style="text-align:right;">
+                                <div style="color:${color}; font-weight:600; font-size:14px;">${sign} Rp ${tx.nominal.toLocaleString('id-ID')}</div>
+                                <div style="background:#F3F4F6; display:inline-block; padding:4px 8px; border-radius:6px; margin-top:5px; cursor:pointer;"><i class="fa-solid fa-ellipsis" style="color:var(--text-muted); font-size:12px;"></i></div>
+                            </div>
+                        </div>`;
+                });
+            }
+        }
+
+        // E. Render Chart.js
+        renderChart(data.statistik);
+    }
+
+    function renderChart(statistik) {
+        const ctx = document.getElementById('weeklyChart').getContext('2d');
+        if (chartInstance) { chartInstance.destroy(); }
+
+        const dates = Object.keys(statistik).sort();
+        const labels = dates.map(dateStr => {
+            const d = new Date(dateStr);
+            return d.getDate() + ' ' + d.toLocaleString('id-ID', { month: 'short' });
+        });
+        
+        const dataIncome = dates.map(d => statistik[d].income);
+        const dataExpense = dates.map(d => statistik[d].expense);
+
+        chartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: labels,
                 datasets: [
-                    { label: 'Pemasukan', data: dataIncome, backgroundColor: '#52c41a', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.4 },
-                    { label: 'Pengeluaran', data: dataExpense, backgroundColor: '#ff4d4f', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.4 }
+                    { label: 'Pemasukan', data: dataIncome, backgroundColor: '#2ECC71', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.8 },
+                    { label: 'Pengeluaran', data: dataExpense, backgroundColor: '#E74C3C', borderRadius: 4, barPercentage: 0.6, categoryPercentage: 0.8 }
                 ]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [5, 5] }, ticks: { callback: function(val) { return val/1000 + 'K'; } } },
-                    x: { grid: { display: false } }
-                }
+                plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(context) { return context.dataset.label + ': Rp ' + context.raw.toLocaleString('id-ID'); } } } },
+                scales: { x: { grid: { display: false }, ticks: { font: { size: 10 } } }, y: { display: false, grid: { display: false } } }
             }
         });
     }
 
-    // Init Apps
-    applySettings();
-    if(APP_URL) loadData();
+    // ==========================================
+    // 5. LOGIKA PENULISAN TRANSAKSI (WRITE)
+    // ==========================================
+    function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    const MAX_WIDTH = 500; 
+                    let width = img.width;
+                    let height = img.height;
 
-</script>
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL("image/jpeg", 0.4)); 
+                };
+            };
+        });
+    }
+
+    async function submitTransaction() {
+        const nominal = Number(document.getElementById("txNominal").value);
+        const tanggal = document.getElementById("txTanggal").value;
+        
+        if (!nominal || nominal <= 0 || !tanggal) {
+            alert("Nominal dan Tanggal tidak boleh kosong!");
+            return;
+        }
+
+        const btnSubmit = document.getElementById("btnSubmitTx");
+        const originalBtnText = btnSubmit.innerHTML;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+        btnSubmit.disabled = true;
+        btnSubmit.style.opacity = "0.7";
+
+        const fileInput = document.getElementById("txStruk");
+        let base64String = "";
+        if (fileInput.files.length > 0) {
+            base64String = await compressImage(fileInput.files[0]);
+        }
+
+        const payloadData = {
+            action: "ADD_TRANSACTION",
+            sheetId: localStorage.getItem("mySheetId"),
+            payload: {
+                tanggal: tanggal,
+                jenis: currentTxType, 
+                nominal: nominal,
+                walletAsal: currentTxType === "Income" ? "" : document.getElementById("txWalletAsal").value,
+                walletTujuan: currentTxType === "Expense" ? "" : document.getElementById("txWalletTujuan").value,
+                kategori: document.getElementById("txKategori").value,
+                catatan: document.getElementById("txCatatan").value,
+                strukBase64: base64String
+            }
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                redirect: "follow",
+                body: JSON.stringify(payloadData)
+            });
+            const res = await response.json();
+            
+            if (res.status === "success") {
+                alert("Berhasil! Transaksi telah dicatat di database.");
+                document.getElementById("txNominal").value = "";
+                document.getElementById("txCatatan").value = "";
+                removeImage(); 
+                loadDashboard(localStorage.getItem("mySheetId"));
+            } else {
+                alert("Terjadi kegagalan di Server: " + res.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Gagal menghubungi server. Periksa koneksi internet Anda.");
+        }
+
+        btnSubmit.innerHTML = originalBtnText;
+        btnSubmit.disabled = false;
+        btnSubmit.style.opacity = "1";
+    }
+
+    // ==========================================
+    // 6. LOGIKA PENGATURAN (SETTINGS)
+    // ==========================================
+    function initSettingsUI() {
+        const savedId = localStorage.getItem("mySheetId");
+        const statusBadge = document.getElementById("koneksi-status");
+        const inputField = document.getElementById("sheetIdInput");
+
+        if (savedId) {
+            inputField.value = savedId;
+            statusBadge.innerText = "Terhubung";
+            statusBadge.style.background = "#E8F5E9"; 
+            statusBadge.style.color = "var(--success)";
+        } else {
+            statusBadge.innerText = "Terputus";
+            statusBadge.style.background = "#FEE2E2"; 
+            statusBadge.style.color = "var(--danger)";
+        }
+    }
+
+    function saveSettings() {
+        let inputVal = document.getElementById("sheetIdInput").value.trim();
+        if (!inputVal) {
+            alert("Harap masukkan URL atau ID Spreadsheet Anda!");
+            return;
+        }
+
+        let sheetId = inputVal;
+        const urlMatch = inputVal.match(/\/d\/([a-zA-Z0-9-_]+)/);
+        if (urlMatch && urlMatch[1]) {
+            sheetId = urlMatch[1]; 
+            document.getElementById("sheetIdInput").value = sheetId; 
+        }
+
+        localStorage.setItem("mySheetId", sheetId);
+        initSettingsUI();
+        alert("Koneksi berhasil disimpan! Aplikasi siap digunakan.");
+        loadDashboard(sheetId); 
+    }
+    </script>
 </body>
 </html>
