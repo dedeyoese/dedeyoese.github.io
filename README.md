@@ -1,2 +1,2 @@
 # dedeyoese.github.io
-Aplikasi Keangan Mandiri
+Personal Websites
