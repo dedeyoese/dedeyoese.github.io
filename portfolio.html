@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio - Solusi Digital & Keamanan</title>
+    <!-- Google Fonts: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #f0f2f5; /* Background abu-abu untuk desktop */
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Mobile Wrapper - Kunci tampilan mobile-only */
+        .mobile-wrapper {
+            max-width: 480px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-x: hidden;
+            padding-bottom: 80px; /* Space untuk bottom nav */
+        }
+
+        .text-primary-custom { color: #0d6efd; }
+        .bg-primary-custom { background-color: #0d6efd; }
+        .bg-light-blue { background-color: #f0f7ff; }
+
+        /* Typography & Badges */
+        h1 { font-size: 1.5rem; font-weight: 700; line-height: 1.3; }
+        h5 { font-size: 1rem; font-weight: 600; }
+        p { font-size: 0.8rem; color: #6c757d; }
+        
+        .badge-custom {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            color: #495057;
+            font-weight: 500;
+            padding: 0.5rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+        }
+
+        /* Services Cards */
+        .service-card {
+            border: 1px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 15px;
+            height: 100%;
+            transition: all 0.3s;
+        }
+        .service-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .service-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+
+        /* Bottom Navigation Bar */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            max-width: 480px;
+            width: 100%;
+            background: #ffffff;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0 20px 0;
+            z-index: 1000;
+            /* Center di desktop */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .nav-item {
+            text-align: center;
+            color: #adb5bd;
+            text-decoration: none;
+            font-size: 0.75rem;
+            flex: 1;
+        }
+        .nav-item i {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+        .nav-item.active { color: #0d6efd; }
+        
+        /* Gambar Hero Placeholder */
+        .hero-img-container {
+            position: relative;
+            margin-top: 20px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Wrapper Start -->
+    <div class="mobile-wrapper">
+        
+        <!-- Header -->
+        <header class="d-flex justify-content-between align-items-center p-3">
+            <div class="d-flex align-items-center">
+                <div class="bg-primary-custom text-white rounded-circle d-flex justify-content-center align-items-center" style="width: 35px; height: 35px; font-weight: bold; font-size: 1.2rem; margin-right: 10px;">
+                    D
+                </div>
+                <div>
+                    <h6 class="mb-0 fw-bold">Portfolio</h6>
+                    <small class="text-muted" style="font-size: 0.65rem;">Web & Tech Solutions</small>
+                </div>
+            </div>
+            <i class="fas fa-bars fs-4"></i>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="p-3">
+            <div class="d-flex gap-2 mb-3">
+                <span class="badge-custom text-success"><i class="fas fa-circle" style="font-size: 0.5rem; vertical-align: middle;"></i> Solusi Teknologi Terpercaya</span>
+            </div>
+            
+            <h1>Solusi Digital & Teknologi untuk <span class="text-primary-custom">Bisnis Anda</span></h1>
+            <p class="mb-4">Menyediakan layanan pembuatan sistem informasi berbasis web, integrasi backend Django & Apps Script, serta instalasi sistem keamanan CCTV.</p>
+            
+            <a href="#" class="btn btn-primary rounded-pill px-4 py-2" style="font-size: 0.85rem;">
+                <i class="fab fa-whatsapp me-2"></i> Hubungi Kami <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+
+            <!-- Ilustrasi Hero (Ganti src dengan gambar aset Anda) -->
+            <div class="hero-img-container bg-light-blue p-4 text-center mt-4">
+                <i class="fas fa-laptop-code text-primary mb-3" style="font-size: 4rem;"></i>
+                <i class="fas fa-video text-secondary ms-4" style="font-size: 3rem;"></i>
+            </div>
+        </section>
+
+        <!-- Layanan Kami -->
+        <section class="p-3 bg-light mt-2">
+            <small class="text-muted fw-bold" style="letter-spacing: 1px;">LAYANAN KAMI</small>
+            <h5 class="fw-bold mt-2 mb-4">Solusi Lengkap untuk Kebutuhan Teknologi Anda</h5>
+            
+            <div class="row g-3">
+                <!-- Card 1 -->
+                <div class="col-6">
+                    <div class="service-card bg-white">
+                        <div class="service-icon bg-light-blue text-primary-custom">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h6 class="fw-bold" style="font-size: 0.85rem;">Web Development</h6>
+                        <p style="font-size: 0.7rem; margin-bottom: 10px;">Pengembangan backend dan web-app interaktif.</p>
+                        <i class="fas fa-arrow-right text-muted" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="col-6">
+                    <div class="service-card bg-white">
+                        <div class="service-icon text-success" style="background-color: #e8f5e9;">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h6 class="fw-bold" style="font-size: 0.85rem;">CCTV & Keamanan</h6>
+                        <p style="font-size: 0.7rem; margin-bottom: 10px;">Instalasi kamera dan konfigurasi keamanan smart home.</p>
+                        <i class="fas fa-arrow-right text-muted" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="col-6">
+                    <div class="service-card bg-white">
+                        <div class="service-icon text-warning" style="background-color: #fff8e1;">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h6 class="fw-bold" style="font-size: 0.85rem;">Server & Linux</h6>
+                        <p style="font-size: 0.7rem; margin-bottom: 10px;">Setup server Ubuntu, Web Server & manajemen log.</p>
+                        <i class="fas fa-arrow-right text-muted" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="col-6">
+                    <div class="service-card bg-white">
+                        <div class="service-icon text-danger" style="background-color: #ffebee;">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                        <h6 class="fw-bold" style="font-size: 0.85rem;">AI Evaluation</h6>
+                        <p style="font-size: 0.7rem; margin-bottom: 10px;">Anotasi data dan evaluasi model bahasa.</p>
+                        <i class="fas fa-arrow-right text-muted" style="font-size: 0.8rem;"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portofolio -->
+        <section class="p-3">
+            <div class="d-flex justify-content-between align-items-end mb-3">
+                <div>
+                    <small class="text-muted fw-bold" style="letter-spacing: 1px;">PORTOFOLIO</small>
+                    <h5 class="fw-bold mt-1 mb-0">Beberapa Project Kami</h5>
+                </div>
+                <a href="#" class="text-primary-custom text-decoration-none" style="font-size: 0.75rem;">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <!-- Horizontal Scroll untuk Portofolio -->
+            <div class="d-flex gap-3" style="overflow-x: auto; padding-bottom: 10px; scrollbar-width: none;">
+                
+                <div class="card border-0" style="min-width: 200px;">
+                    <div class="bg-dark rounded mb-2 d-flex align-items-center justify-content-center" style="height: 120px;">
+                        <i class="fas fa-chart-line text-white fs-1"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0" style="font-size: 0.85rem;">Sistem Keuangan Web</h6>
+                    <small class="text-muted" style="font-size: 0.7rem;">Web Application</small>
+                </div>
+
+                <div class="card border-0" style="min-width: 200px;">
+                    <div class="bg-secondary rounded mb-2 d-flex align-items-center justify-content-center" style="height: 120px;">
+                         <i class="fas fa-shield-alt text-white fs-1"></i>
+                    </div>
+                    <h6 class="fw-bold mb-0" style="font-size: 0.85rem;">Setup Keamanan CCTV</h6>
+                    <small class="text-muted" style="font-size: 0.7rem;">CCTV & Security</small>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Bottom Banner CTA -->
+        <div class="m-3 p-4 bg-dark text-white rounded-4" style="background: linear-gradient(135deg, #1a1a2e, #16213e);">
+            <small style="font-size: 0.65rem; color: #a9b0bb;">SIAP MEMBANTU</small>
+            <h6 class="fw-bold mt-1 mb-3">Punya kebutuhan teknologi?</h6>
+            <a href="mailto:dedeyoesep@gmail.com" class="btn btn-light btn-sm rounded-pill fw-bold text-dark w-100 py-2">
+                <i class="fas fa-envelope text-success me-1"></i> Hubungi Kami <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        <!-- Bottom Navigation Menu -->
+        <nav class="bottom-nav">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-home"></i>
+                Home
+            </a>
+            <a href="#" class="nav-item">
+                <i class="fas fa-th-large"></i>
+                Layanan
+            </a>
+            <a href="#" class="nav-item">
+                <i class="far fa-folder"></i>
+                Project
+            </a>
+            <a href="#" class="nav-item">
+                <i class="far fa-user"></i>
+                Kontak
+            </a>
+        </nav>
+
+    </div>
+    <!-- Wrapper End -->
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
